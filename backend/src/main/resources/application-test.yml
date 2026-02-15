@@ -11,9 +11,6 @@ spring:
   flyway:
     enabled: true
 
-  kafka:
-    bootstrap-servers: ${spring.embedded.kafka.brokers:localhost:9092}
-
   data:
     redis:
       host: localhost

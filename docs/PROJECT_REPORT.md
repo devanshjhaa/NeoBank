@@ -4,7 +4,7 @@
 
 NeoBank is a closed-loop INR wallet backend built with Spring Boot 4 and Java 21. It demonstrates production-grade financial engineering patterns — ledger-first accounting, idempotent transactions, distributed locking, and event-driven processing — deployed on AWS (EC2, RDS, S3).
 
-Users sign up via OAuth or email, verify their phone via OTP, receive a wallet, and can top up, transfer, or withdraw money. Every money movement is recorded as an immutable ledger entry. Kafka handles async side effects (notifications, payouts), and Redis handles distributed locking and OTP storage.
+Users sign up via OAuth or email, verify their phone via OTP, receive a wallet, and can top up, transfer, or withdraw money. Every money movement is recorded as an immutable ledger entry. A DB-based outbox with a scheduled poller handles async side effects (notifications, payouts), and Redis handles distributed locking and OTP storage.
 
 ---
 
@@ -15,8 +15,8 @@ Users sign up via OAuth or email, verify their phone via OTP, receive a wallet, 
 | Language | Java 21 |
 | Framework | Spring Boot 4.0.2 |
 | Database | PostgreSQL 16 (AWS RDS) |
-| Cache / Locking | Redis 7 (AWS ElastiCache) |
-| Messaging | Apache Kafka 3.9 (KRaft) |
+| Cache / Locking | Redis 7 (Upstash) |
+| Async Events | DB Outbox + @Scheduled Poller |
 | Migrations | Flyway |
 | Auth | OAuth2 + Email/Password → Phone OTP + JWT |
 | Email | Resend (SMTP) |
@@ -336,14 +336,14 @@ Immutable — entries are never updated or deleted.
 ### Money Out — Bank Withdrawal
 - Register and verify bank account
 - Initiate payout (immediate wallet debit)
-- Async payout processing via Kafka
+- Async payout processing via outbox poller
 - Webhook callback for success/failure
 - Automatic reversal on failure
 
 ### Notifications
 - Email via Resend on every financial event
 - Simulated SMS (swappable interface)
-- Triggered by Kafka consumers
+- Triggered by outbox event poller
 
 ### Premium Tier
 - Higher daily/monthly limits
@@ -395,7 +395,6 @@ sequenceDiagram
     participant API as TopUp
     participant RZ as Razorpay
     participant DB as PostgreSQL
-    participant K as Kafka
 
     C->>API: POST /topup/initiate {amount}
     API->>RZ: Create order
@@ -409,7 +408,7 @@ sequenceDiagram
     API->>DB: wallet.balance += amount
     API->>DB: outbox event
     API->>DB: COMMIT
-    K-->>K: Notify user
+    Note over DB: Poller picks up outbox → notifies user
 ```
 
 ### P2P Transfer Flow
@@ -420,7 +419,6 @@ sequenceDiagram
     participant API as Transfer
     participant Redis as Redis
     participant DB as PostgreSQL
-    participant K as Kafka
 
     C->>API: POST /transfer {receiverPhone, amount}
     API->>DB: Check limits
@@ -438,7 +436,7 @@ sequenceDiagram
 
     API->>Redis: Release lock
     API-->>C: {transactionId, SUCCESS}
-    K-->>K: Notify both parties
+    Note over DB: Poller picks up outbox → notifies both parties
 ```
 
 ### Withdrawal Flow
@@ -448,7 +446,6 @@ sequenceDiagram
     participant C as Client
     participant API as Payout
     participant DB as PostgreSQL
-    participant K as Kafka
     participant GW as Gateway
 
     C->>API: POST /payout/request {bankAccountId, amount}
@@ -460,7 +457,7 @@ sequenceDiagram
     API->>DB: COMMIT
     API-->>C: {payoutId, PROCESSING}
 
-    K->>GW: Process payout
+    Note over DB: Poller picks up outbox → sends to gateway
     GW->>API: Webhook callback
 
     alt Success
@@ -557,18 +554,18 @@ Used for P2P transfers (sender side) and withdrawals.
 
 ## 11. Event-Driven Architecture
 
-### Kafka Topics
+### Event Types
 
-| Topic | Purpose |
+| Event | Purpose |
 |---|---|
-| wallet.topup.completed | Notify user of successful top-up |
-| wallet.transfer.completed | Notify sender and receiver |
-| wallet.payout.requested | Trigger payout processing |
-| wallet.payout.completed | Notify user of payout result |
+| TOPUP_COMPLETED | Notify user of successful top-up |
+| TRANSFER_COMPLETED | Notify sender and receiver |
+| PAYOUT_REQUESTED | Trigger payout processing |
+| PAYOUT_COMPLETED | Notify user of payout result |
 
 ### Outbox Pattern
 
-Events written to `outbox_events` table inside the same DB transaction as the business logic. A poller publishes unpublished events to Kafka every 5 seconds. Guarantees at-least-once delivery.
+Events written to `outbox_events` table inside the same DB transaction as the business logic. A `@Scheduled` poller runs every 5 seconds, picks up unpublished events, processes them (sends notifications, triggers payouts), and marks them as published. Guarantees at-least-once delivery without external messaging infrastructure.
 
 ---
 
@@ -721,21 +718,21 @@ Failed withdrawals trigger automatic REVERSAL ledger entries. All errors carry a
 
 ```mermaid
 graph LR
-    CLIENT[Client] --> ALB[ALB]
-    ALB --> EC2[EC2 - Spring Boot]
+    CLIENT[Client] --> EC2[EC2 + Nginx]
     EC2 --> RDS[RDS PostgreSQL]
-    EC2 --> REDIS[ElastiCache Redis]
-    EC2 --> KAFKA[MSK / EC2 Kafka]
+    EC2 --> REDIS[Upstash Redis]
     EC2 --> S3[S3 - CSV Exports]
     EC2 --> RESEND[Resend SMTP]
+    EC2 --> RZ[Razorpay Sandbox]
 ```
 
-- Docker image pushed to ECR, deployed on EC2
-- RDS for managed PostgreSQL with automated backups
-- ElastiCache for managed Redis
-- S3 for file storage (CSV exports)
-- ALB routes traffic, uses `/actuator/health` for health checks
+- Docker image pushed to ECR, deployed on EC2 (t2.micro free tier)
+- RDS for managed PostgreSQL (db.t3.micro free tier)
+- Upstash for managed Redis (free tier)
+- S3 for file storage (free tier)
+- Nginx reverse proxy on EC2
 - Flyway runs migrations on startup
+- Monthly cost: ₹0
 
 ---
 
