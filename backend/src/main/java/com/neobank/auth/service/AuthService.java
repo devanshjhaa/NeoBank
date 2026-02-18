@@ -1,6 +1,7 @@
 package com.neobank.auth.service;
 
 import com.neobank.auth.otp.OtpService;
+import com.neobank.auth.security.JwtProvider;
 import com.neobank.user.entity.User;
 import com.neobank.user.repository.UserRepository;
 import com.neobank.wallet.service.WalletService;
@@ -18,13 +19,16 @@ public class AuthService {
     private final UserRepository userRepository;
     private final WalletService walletService;
     private final OtpService otpService;
+    private final JwtProvider jwtProvider;
 
     public AuthService(UserRepository userRepository,
                        WalletService walletService,
-                       OtpService otpService) {
+                       OtpService otpService,
+                       JwtProvider jwtProvider) {
         this.userRepository = userRepository;
         this.walletService = walletService;
         this.otpService = otpService;
+        this.jwtProvider = jwtProvider;
     }
 
     public void requestOtp(String phone) {
@@ -32,7 +36,7 @@ public class AuthService {
     }
 
     @Transactional
-    public void verifyOtp(String email, String phone, String otp) {
+    public String verifyOtp(String email, String phone, String otp) {
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -49,6 +53,12 @@ public class AuthService {
 
         walletService.createWalletIfAbsent(user.getId());
 
-        log.info("User phone verified and wallet created for email={}", email);
+        log.info("User verified email={}", email);
+
+        return jwtProvider.createToken(
+                user.getId(),
+                user.getEmail(),
+                user.getTier()
+        );
     }
 }
