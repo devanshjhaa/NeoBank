@@ -70,3 +70,15 @@ logging:
     com.neobank: DEBUG
     org.springframework.security: INFO
     org.flywaydb: INFO
+
+sms:
+  fast2sms:
+    api-key: ${FAST2SMS_API_KEY}
+    sender-id: FSTSMS
+    route: q
+
+sentry:
+  dsn: ${SENTRY_DSN}
+  environment: local
+  traces-sample-rate: 0.2
+  send-default-pii: false
