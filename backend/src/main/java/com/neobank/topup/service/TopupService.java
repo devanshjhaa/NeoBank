@@ -1,5 +1,6 @@
 package com.neobank.topup.service;
 
+import com.neobank.common.outbox.OutboxService;
 import com.neobank.ledger.entity.LedgerEntry;
 import com.neobank.ledger.service.LedgerService;
 import com.neobank.topup.entity.Topup;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -17,20 +19,23 @@ public class TopupService {
     private final TopupRepository topupRepository;
     private final WalletService walletService;
     private final LedgerService ledgerService;
+    private final OutboxService outboxService;
 
     public TopupService(TopupRepository topupRepository,
-                        WalletService walletService,
-                        LedgerService ledgerService) {
+            WalletService walletService,
+            LedgerService ledgerService,
+            OutboxService outboxService) {
         this.topupRepository = topupRepository;
         this.walletService = walletService;
         this.ledgerService = ledgerService;
+        this.outboxService = outboxService;
     }
 
     @Transactional
     public Topup confirmTopup(Long userId,
-                              BigDecimal amount,
-                              String idempotencyKey,
-                              String gatewayRef) {
+            BigDecimal amount,
+            String idempotencyKey,
+            String gatewayRef) {
 
         var existing = topupRepository.findByIdempotencyKey(idempotencyKey);
         if (existing.isPresent()) {
@@ -44,17 +49,14 @@ public class TopupService {
 
         String ref = UUID.randomUUID().toString();
 
-        LedgerEntry entry = LedgerEntry.credit(
-                walletId,
-                amount,
-                "TOPUP",
-                ref,
-                "Wallet top-up"
-        );
-
-        ledgerService.record(entry);
+        ledgerService.record(
+                LedgerEntry.credit(walletId, amount, "TOPUP", ref, "Wallet top-up"));
 
         topup.markSuccess(gatewayRef);
+
+        outboxService.save("TOPUP_COMPLETED", Map.of(
+                "userId", userId,
+                "amount", amount.toPlainString()));
 
         return topup;
     }

@@ -12,8 +12,7 @@ import java.time.Duration;
 @Service
 public class OtpService {
 
-    private static final Logger log =
-            LoggerFactory.getLogger(OtpService.class);
+    private static final Logger log = LoggerFactory.getLogger(OtpService.class);
 
     private static final Duration OTP_TTL = Duration.ofMinutes(5);
     private static final int MAX_ATTEMPTS = 5;
@@ -23,46 +22,35 @@ public class OtpService {
     private final SecureRandom random = new SecureRandom();
 
     public OtpService(StringRedisTemplate redis,
-                      SmsGateway smsGateway) {
+            SmsGateway smsGateway) {
         this.redis = redis;
         this.smsGateway = smsGateway;
     }
 
-    // ===== Request OTP =====
     public void sendOtp(String phone) {
-
         String otp = generateOtp();
 
-        String otpKey = otpKey(phone);
-        String attemptsKey = attemptsKey(phone);
-
-        redis.opsForValue().set(otpKey, otp, OTP_TTL);
-        redis.opsForValue().set(attemptsKey, "0", OTP_TTL);
+        redis.opsForValue().set(otpKey(phone), otp, OTP_TTL);
+        redis.opsForValue().set(attemptsKey(phone), "0", OTP_TTL);
 
         smsGateway.sendOtp(phone, otp);
 
-        log.info("OTP generated and stored for phone={}", mask(phone));
+        log.info("OTP sent to phone={}", mask(phone));
     }
 
-    // ===== Verify OTP =====
     public boolean verifyOtp(String phone, String providedOtp) {
-
-        String otpKey = otpKey(phone);
-        String attemptsKey = attemptsKey(phone);
-
-        String storedOtp = redis.opsForValue().get(otpKey);
+        String storedOtp = redis.opsForValue().get(otpKey(phone));
 
         if (storedOtp == null) {
-            log.warn("OTP expired or missing for phone={}", mask(phone));
+            log.warn("OTP expired for phone={}", mask(phone));
             return false;
         }
 
-        int attempts = incrementAttempts(attemptsKey);
+        int attempts = incrementAttempts(attemptsKey(phone));
 
         if (attempts > MAX_ATTEMPTS) {
-            redis.delete(otpKey);
-            redis.delete(attemptsKey);
-
+            redis.delete(otpKey(phone));
+            redis.delete(attemptsKey(phone));
             log.warn("OTP attempts exceeded for phone={}", mask(phone));
             return false;
         }
@@ -72,18 +60,13 @@ public class OtpService {
             return false;
         }
 
-        redis.delete(otpKey);
-        redis.delete(attemptsKey);
-
-        log.info("OTP verified successfully for phone={}", mask(phone));
+        redis.delete(otpKey(phone));
+        redis.delete(attemptsKey(phone));
         return true;
     }
 
-    // ===== Helpers =====
-
     private String generateOtp() {
-        int value = 100000 + random.nextInt(900000);
-        return String.valueOf(value);
+        return String.valueOf(100000 + random.nextInt(900000));
     }
 
     private int incrementAttempts(String key) {
@@ -100,7 +83,8 @@ public class OtpService {
     }
 
     private String mask(String phone) {
-        if (phone == null || phone.length() < 4) return "****";
+        if (phone == null || phone.length() < 4)
+            return "****";
         return "******" + phone.substring(phone.length() - 4);
     }
 }

@@ -20,7 +20,7 @@ public class LedgerEntry extends BaseEntity {
     private BigDecimal amount;
 
     @Column(nullable = false)
-    private String direction; // CREDIT or DEBIT
+    private String direction;
 
     @Column(name = "txn_type", nullable = false)
     private String txnType;
@@ -31,15 +31,9 @@ public class LedgerEntry extends BaseEntity {
     @Column
     private String description;
 
-    // ===== Factory methods =====
-
-    public static LedgerEntry credit(
-            Long walletId,
-            BigDecimal amount,
-            String txnType,
-            String referenceId,
-            String description
-    ) {
+    public static LedgerEntry credit(Long walletId, BigDecimal amount,
+            String txnType, String referenceId,
+            String description) {
         LedgerEntry e = new LedgerEntry();
         e.walletId = walletId;
         e.amount = amount;
@@ -50,13 +44,9 @@ public class LedgerEntry extends BaseEntity {
         return e;
     }
 
-    public static LedgerEntry debit(
-            Long walletId,
-            BigDecimal amount,
-            String txnType,
-            String referenceId,
-            String description
-    ) {
+    public static LedgerEntry debit(Long walletId, BigDecimal amount,
+            String txnType, String referenceId,
+            String description) {
         LedgerEntry e = new LedgerEntry();
         e.walletId = walletId;
         e.amount = amount;

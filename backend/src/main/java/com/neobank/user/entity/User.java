@@ -29,7 +29,12 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String tier = "FREE";
 
-    // ===== Domain methods =====
+    public static User createWithEmail(String email, String passwordHash) {
+        User user = new User();
+        user.email = email;
+        user.passwordHash = passwordHash;
+        return user;
+    }
 
     public void verifyPhone(String phone) {
         this.phone = phone;

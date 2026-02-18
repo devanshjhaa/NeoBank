@@ -1,5 +1,7 @@
 package com.neobank.auth.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public record RequestOtpRequest(
-        String phone
-) {}
+                @NotBlank String phone) {
+}

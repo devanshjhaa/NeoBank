@@ -1,5 +1,6 @@
 package com.neobank.payout.service;
 
+import com.neobank.common.outbox.OutboxService;
 import com.neobank.ledger.entity.LedgerEntry;
 import com.neobank.ledger.service.LedgerService;
 import com.neobank.payout.entity.Payout;
@@ -9,77 +10,95 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
 public class PayoutService {
 
-    private final PayoutRepository payoutRepository;
-    private final WalletService walletService;
-    private final LedgerService ledgerService;
+        private final PayoutRepository payoutRepository;
+        private final WalletService walletService;
+        private final LedgerService ledgerService;
+        private final OutboxService outboxService;
 
-    public PayoutService(PayoutRepository payoutRepository,
-                         WalletService walletService,
-                         LedgerService ledgerService) {
-        this.payoutRepository = payoutRepository;
-        this.walletService = walletService;
-        this.ledgerService = ledgerService;
-    }
+        public PayoutService(PayoutRepository payoutRepository,
+                        WalletService walletService,
+                        LedgerService ledgerService,
+                        OutboxService outboxService) {
+                this.payoutRepository = payoutRepository;
+                this.walletService = walletService;
+                this.ledgerService = ledgerService;
+                this.outboxService = outboxService;
+        }
 
-    @Transactional
-    public Payout requestPayout(Long userId,
-                                Long bankAccountId,
-                                BigDecimal amount,
-                                String idempotencyKey) {
+        @Transactional
+        public Payout requestPayout(Long userId,
+                        Long bankAccountId,
+                        BigDecimal amount,
+                        String idempotencyKey) {
 
-        var existing = payoutRepository.findByIdempotencyKey(idempotencyKey);
-        if (existing.isPresent()) return existing.get();
+                var existing = payoutRepository.findByIdempotencyKey(idempotencyKey);
+                if (existing.isPresent())
+                        return existing.get();
 
-        Payout payout = Payout.init(userId, bankAccountId, amount, idempotencyKey);
-        payoutRepository.save(payout);
+                Payout payout = Payout.init(userId, bankAccountId, amount, idempotencyKey);
+                payoutRepository.save(payout);
 
-        payout.markProcessing();
+                payout.markProcessing();
 
-        Long walletId = walletService.debitWallet(userId, amount);
+                Long walletId = walletService.debitWallet(userId, amount);
 
-        String ref = UUID.randomUUID().toString();
+                String ref = UUID.randomUUID().toString();
 
-        ledgerService.record(
-                LedgerEntry.debit(walletId, amount, "WITHDRAW", ref, "Bank payout")
-        );
+                ledgerService.record(
+                                LedgerEntry.debit(walletId, amount, "WITHDRAW", ref, "Bank payout"));
 
-        return payout;
-    }
+                outboxService.save("PAYOUT_REQUESTED", Map.of(
+                                "payoutId", payout.getId(),
+                                "userId", userId,
+                                "amount", amount.toPlainString()));
 
-    @Transactional
-    public void confirmSuccess(Long payoutId) {
-        Payout payout = payoutRepository.findById(payoutId)
-                .orElseThrow();
+                return payout;
+        }
 
-        payout.markSuccess();
-    }
+        @Transactional
+        public void confirmSuccess(Long payoutId) {
+                Payout payout = payoutRepository.findById(payoutId)
+                                .orElseThrow();
 
-    @Transactional
-    public void confirmFailure(Long payoutId) {
+                payout.markSuccess();
 
-        Payout payout = payoutRepository.findById(payoutId)
-                .orElseThrow();
+                outboxService.save("PAYOUT_COMPLETED", Map.of(
+                                "payoutId", payoutId,
+                                "userId", payout.getUserId(),
+                                "amount", payout.getAmount().toPlainString(),
+                                "result", "SUCCESS"));
+        }
 
-        payout.markFailed();
+        @Transactional
+        public void confirmFailure(Long payoutId) {
+                Payout payout = payoutRepository.findById(payoutId)
+                                .orElseThrow();
 
-        Long walletId = walletService.creditWallet(
-                payout.getUserId(),
-                payout.getAmount()
-        );
+                payout.markFailed();
 
-        String ref = UUID.randomUUID().toString();
+                Long walletId = walletService.creditWallet(
+                                payout.getUserId(),
+                                payout.getAmount());
 
-        ledgerService.record(
-                LedgerEntry.credit(walletId,
-                        payout.getAmount(),
-                        "REVERSAL",
-                        ref,
-                        "Payout failed reversal")
-        );
-    }
+                String ref = UUID.randomUUID().toString();
+
+                ledgerService.record(
+                                LedgerEntry.credit(walletId,
+                                                payout.getAmount(),
+                                                "REVERSAL",
+                                                ref,
+                                                "Payout failed reversal"));
+
+                outboxService.save("PAYOUT_COMPLETED", Map.of(
+                                "payoutId", payoutId,
+                                "userId", payout.getUserId(),
+                                "amount", payout.getAmount().toPlainString(),
+                                "result", "FAILED"));
+        }
 }

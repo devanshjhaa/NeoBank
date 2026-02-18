@@ -2,8 +2,10 @@ package com.neobank.transfer.controller;
 
 import com.neobank.auth.security.AuthPrincipal;
 import com.neobank.transfer.dto.TransferRequest;
+import com.neobank.transfer.dto.TransferResponse;
 import com.neobank.transfer.entity.Transaction;
 import com.neobank.transfer.service.TransferService;
+import jakarta.validation.Valid;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,16 +20,21 @@ public class TransferController {
     }
 
     @PostMapping
-    public Transaction transfer(
+    public TransferResponse transfer(
             @AuthenticationPrincipal AuthPrincipal principal,
-            @RequestBody TransferRequest req
-    ) {
-
-        return transferService.transfer(
-                principal.getUserId(),  // sender
+            @Valid @RequestBody TransferRequest req) {
+        Transaction tx = transferService.transfer(
+                principal.getUserId(),
                 req.receiverId(),
                 req.amount(),
-                req.idempotencyKey()
-        );
+                req.idempotencyKey());
+
+        return new TransferResponse(
+                tx.getId(),
+                tx.getSenderId(),
+                tx.getReceiverId(),
+                tx.getAmount(),
+                tx.getStatus(),
+                tx.getCreatedAt());
     }
 }

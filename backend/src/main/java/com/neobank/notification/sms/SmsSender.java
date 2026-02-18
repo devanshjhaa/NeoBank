@@ -1,21 +1,31 @@
 package com.neobank.notification.sms;
 
+import com.neobank.auth.sms.SmsGateway;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestClient;
-import org.springframework.http.MediaType;
 
 @Component
 public class SmsSender {
 
-    private final RestClient restClient = RestClient.create("https://www.fast2sms.com");
+    private static final Logger log = LoggerFactory.getLogger(SmsSender.class);
+
+    private final SmsGateway smsGateway;
+
+    public SmsSender(SmsGateway smsGateway) {
+        this.smsGateway = smsGateway;
+    }
 
     public void send(String phone, String message) {
+        if (phone == null || phone.isBlank()) {
+            log.warn("Skipping SMS — no phone number");
+            return;
+        }
 
-        restClient.post()
-                .uri("/dev/bulkV2")
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .body("message=" + message + "&numbers=" + phone)
-                .retrieve()
-                .toBodilessEntity();
+        try {
+            smsGateway.sendOtp(phone, message);
+        } catch (Exception ex) {
+            log.error("SMS send failed phone={}", phone, ex);
+        }
     }
 }

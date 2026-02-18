@@ -25,8 +25,6 @@ public class Wallet extends BaseEntity {
     @Column(nullable = false)
     private String status = "ACTIVE";
 
-    // ===== Factory =====
-
     public static Wallet createForUser(Long userId) {
         Wallet wallet = new Wallet();
         wallet.userId = userId;
@@ -35,8 +33,6 @@ public class Wallet extends BaseEntity {
         wallet.status = "ACTIVE";
         return wallet;
     }
-
-    // ===== Domain methods =====
 
     public void credit(BigDecimal amount) {
         this.balance = this.balance.add(amount);
