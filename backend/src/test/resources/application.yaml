@@ -1,0 +1,44 @@
+spring:
+  application:
+    name: neobank-wallet
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc.time_zone: UTC
+
+  flyway:
+    enabled: true
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  mail:
+    host: localhost
+    port: 25
+    username: test
+    password: test
+
+server:
+  port: 0
+  servlet:
+    context-path: /api/v1
+
+sms:
+  fast2sms:
+    api-key: test-key
+    sender-id: TESTSMS
+    route: q
+
+jwt:
+  secret: test-secret-key-must-be-at-least-32-characters-long-for-hmac
+  access-ttl-seconds: 1800
+
+logging:
+  level:
+    com.neobank: DEBUG
