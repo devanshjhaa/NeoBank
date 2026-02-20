@@ -2,10 +2,8 @@ target/
 .git/
 .idea/
 .vscode/
-*.md
 *.iml
-.mvn/
-mvnw
-mvnw.cmd
 docker-compose.yml
+.dockerignore
+.env
 Documents/
