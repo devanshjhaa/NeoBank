@@ -1,12 +1,12 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 
-/* ═══════════════════════════════════════════════════════
-   Locomotive Scroll v5 — smooth scroll
-   ═══════════════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   Locomotive Scroll v5 â€” smooth scroll
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 function useLocoScroll() {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -27,9 +27,9 @@ function useLocoScroll() {
   return ref;
 }
 
-/* ═══════════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    Scroll-triggered reveal
-   ═══════════════════════════════════════════════════════ */
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 function Reveal({
   children,
   className = "",
@@ -69,9 +69,9 @@ function Reveal({
   );
 }
 
-/* ═══════════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    Animated counter
-   ═══════════════════════════════════════════════════════ */
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 function useCountUp(end: number, duration = 2000) {
   const [value, setValue] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
@@ -98,13 +98,13 @@ function useCountUp(end: number, duration = 2000) {
   return { value, ref };
 }
 
-/* ═══════════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    Data
-   ═══════════════════════════════════════════════════════ */
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const NAV_LINKS = [
-  { label: "Wallet", href: "#wallet" },
-  { label: "Transfers", href: "#features" },
-  { label: "Payouts", href: "#features" },
+  { label: "Features", href: "#features" },
+  { label: "Dashboard", href: "#dashboard" },
+  { label: "How it Works", href: "#how-it-works" },
   { label: "Pricing", href: "#pricing" },
 ];
 
@@ -158,9 +158,9 @@ const STEPS = [
   { num: "03", title: "Start Transacting", desc: "Send transfers, request payouts, or upgrade to Premium." },
 ];
 
-/* ═══════════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    Page
-   ═══════════════════════════════════════════════════════ */
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 export default function Home() {
   const scrollRef = useLocoScroll();
   const [navShadow, setNavShadow] = useState(false);
@@ -177,16 +177,13 @@ export default function Home() {
     return () => clearTimeout(t);
   }, []);
 
-  const users = useCountUp(50000);
-  const volume = useCountUp(10);
+  const users = useCountUp(1200);
+  const volume = useCountUp(50);
   const uptime = useCountUp(999);
   const speed = useCountUp(5);
 
   return (
     <div ref={scrollRef} className="bg-white antialiased">
-      {/* ──────────────────────────────────────────────
-          NAVBAR — always white, Razorpay style
-      ────────────────────────────────────────────── */}
       <header
         className={`fixed top-0 inset-x-0 z-[100] bg-white transition-shadow duration-300 ${
           navShadow ? "shadow-[0_2px_8px_rgba(0,0,0,.06)]" : ""
@@ -232,20 +229,14 @@ export default function Home() {
         </nav>
       </header>
 
-      {/* ──────────────────────────────────────────────
-          HERO — White bg, blue accent triangle, Razorpay style
-      ────────────────────────────────────────────── */}
       <section className="relative pt-[64px] overflow-hidden bg-white">
-        {/* Blue geometric accent on right — the Razorpay triangle */}
         <div className="absolute top-0 right-0 w-[55%] h-full hidden lg:block">
           <div className="absolute inset-0 bg-gradient-to-bl from-blue-600 via-blue-500 to-blue-400" style={{ clipPath: "polygon(30% 0, 100% 0, 100% 100%, 12% 100%)" }} />
-          {/* Subtle light strip */}
           <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent" style={{ clipPath: "polygon(30% 0, 100% 0, 100% 100%, 12% 100%)" }} />
         </div>
 
         <div className="relative max-w-[1280px] mx-auto px-6 lg:px-8 pt-14 pb-8 lg:pt-20 lg:pb-14">
           <div className="grid lg:grid-cols-2 gap-12 items-center min-h-[460px]">
-            {/* Left — text content */}
             <div className="relative z-10">
               <h1
                 className={`transition-all duration-[900ms] ease-[cubic-bezier(.19,1,.22,1)] ${
@@ -285,14 +276,12 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Right — Dashboard mockup card floating over blue triangle */}
             <div
               className={`relative z-10 hidden lg:flex justify-end transition-all duration-[1100ms] delay-200 ease-[cubic-bezier(.19,1,.22,1)] ${
                 heroLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
               }`}
             >
               <div className="w-[400px] rounded-2xl bg-white shadow-2xl shadow-blue-900/10 border border-slate-200/60 overflow-hidden" data-scroll data-scroll-speed="-0.5">
-                {/* Header */}
                 <div className="px-5 py-3 border-b border-slate-100 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div className="w-5 h-5 rounded bg-blue-600 grid place-items-center">
@@ -306,7 +295,6 @@ export default function Home() {
                     <div className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
                   </div>
                 </div>
-                {/* Balance */}
                 <div className="px-5 pt-5 pb-3">
                   <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Total Balance</p>
                   <p className="text-[26px] font-bold text-slate-900 mt-0.5">{"\u20B9"}1,07,843<span className="text-[16px] text-slate-400">.82</span></p>
@@ -315,7 +303,6 @@ export default function Home() {
                     +12.5%
                   </span>
                 </div>
-                {/* Mini chart */}
                 <div className="px-5 pb-2">
                   <svg viewBox="0 0 360 70" className="w-full h-auto">
                     <defs>
@@ -328,7 +315,6 @@ export default function Home() {
                     <path d="M0 55 Q40 48 80 42 T160 30 T240 22 T320 18 T360 8" fill="none" stroke="#2563eb" strokeWidth="2" />
                   </svg>
                 </div>
-                {/* Transactions */}
                 <div className="px-5 pb-5 space-y-1">
                   {[
                     { label: "UPI Top Up", amount: "+\u20B95,000", positive: true, time: "2 min ago" },
@@ -356,7 +342,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* ─── Quick Actions Bar (Razorpay-style floating) ──── */}
         <div
           className={`relative z-20 max-w-[1100px] mx-auto px-6 lg:px-8 -mb-7 transition-all duration-[900ms] delay-[500ms] ease-[cubic-bezier(.19,1,.22,1)] ${
             heroLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
@@ -386,9 +371,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ──────────────────────────────────────────────
-          TRUSTED BY — brand logos
-      ────────────────────────────────────────────── */}
       <section className="pt-20 pb-10 bg-white">
         <Reveal>
           <div className="max-w-[1100px] mx-auto px-6 lg:px-8">
@@ -403,14 +385,11 @@ export default function Home() {
         </Reveal>
       </section>
 
-      {/* ──────────────────────────────────────────────
-          STATS
-      ────────────────────────────────────────────── */}
       <section className="py-12 bg-white border-y border-slate-100">
         <div className="max-w-[1100px] mx-auto px-6 lg:px-8 grid grid-cols-2 md:grid-cols-4 gap-8">
           {[
             { ref: users.ref, val: `${users.value.toLocaleString("en-IN")}+`, label: "Active Users" },
-            { ref: volume.ref, val: `\u20B9${volume.value} Cr+`, label: "Processed" },
+            { ref: volume.ref, val: `\u20B9${volume.value}L+`, label: "Processed" },
             { ref: uptime.ref, val: `${(uptime.value / 10).toFixed(1)}%`, label: "Uptime SLA" },
             { ref: speed.ref, val: `<${speed.value}s`, label: "Transfer Speed" },
           ].map((s, i) => (
@@ -422,9 +401,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ──────────────────────────────────────────────
-          FEATURES
-      ────────────────────────────────────────────── */}
       <section id="features" className="py-24 bg-white">
         <div className="max-w-[1280px] mx-auto px-6 lg:px-8">
           <Reveal>
@@ -434,7 +410,7 @@ export default function Home() {
                 Everything you need to<br />manage your money
               </h2>
               <p className="mt-4 text-[16px] text-slate-500 leading-relaxed">
-                From instant transfers to premium banking — NeoBank has you covered.
+                From instant transfers to premium banking â€” NeoBank has you covered.
               </p>
             </div>
           </Reveal>
@@ -455,10 +431,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ──────────────────────────────────────────────
-          SHOWCASE — light split with dashboard preview
-      ────────────────────────────────────────────── */}
-      <section className="py-24 bg-slate-50 border-y border-slate-100 overflow-hidden">
+      <section id="dashboard" className="py-24 bg-slate-50 border-y border-slate-100 overflow-hidden">
         <div className="max-w-[1280px] mx-auto px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <Reveal>
@@ -468,7 +441,7 @@ export default function Home() {
                   Your command center<br />for every transaction.
                 </h2>
                 <p className="mt-5 text-[16px] text-slate-500 leading-relaxed max-w-md">
-                  Real-time balance, full transaction history, analytics, and quick actions — all in a clean, modern interface built for speed.
+                  Real-time balance, full transaction history, analytics, and quick actions â€” all in a clean, modern interface built for speed.
                 </p>
                 <div className="mt-8 flex flex-wrap gap-3">
                   {["Real-time Updates", "Smart Charts", "Quick Actions", "Secure & Private"].map((tag) => (
@@ -482,7 +455,6 @@ export default function Home() {
             <Reveal delay={150}>
               <div className="relative" data-scroll data-scroll-speed="0.3">
                 <div className="rounded-2xl bg-white border border-slate-200 p-5 shadow-lg shadow-slate-200/50">
-                  {/* Stat cards */}
                   <div className="grid grid-cols-3 gap-3 mb-4">
                     {[
                       { label: "Balance", val: "\u20B91,07,843", color: "text-blue-600" },
@@ -495,7 +467,6 @@ export default function Home() {
                       </div>
                     ))}
                   </div>
-                  {/* Chart */}
                   <div className="rounded-xl bg-slate-50 border border-slate-100 p-4 mb-4">
                     <div className="flex items-center justify-between mb-3">
                       <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Revenue Overview</span>
@@ -513,7 +484,6 @@ export default function Home() {
                       <circle cx="400" cy="12" r="3.5" fill="#2563eb" />
                     </svg>
                   </div>
-                  {/* Actions */}
                   <div className="flex gap-2">
                     {["Send", "Top Up", "Payout", "History"].map((a) => (
                       <div key={a} className="flex-1 py-2.5 rounded-lg bg-slate-50 border border-slate-100 text-center text-[10px] font-semibold text-slate-500">
@@ -528,9 +498,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ──────────────────────────────────────────────
-          HOW IT WORKS
-      ────────────────────────────────────────────── */}
       <section id="how-it-works" className="py-28 bg-white">
         <div className="max-w-[1280px] mx-auto px-6 lg:px-8">
           <Reveal>
@@ -564,9 +531,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ──────────────────────────────────────────────
-          PRICING
-      ────────────────────────────────────────────── */}
       <section id="pricing" className="py-28 bg-slate-50 border-y border-slate-100">
         <div className="max-w-[1100px] mx-auto px-6 lg:px-8">
           <Reveal>
@@ -634,9 +598,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ──────────────────────────────────────────────
-          CTA
-      ────────────────────────────────────────────── */}
       <section className="py-24 bg-white">
         <div className="max-w-[800px] mx-auto px-6 text-center">
           <Reveal>
@@ -666,13 +627,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ──────────────────────────────────────────────
-          FOOTER
-      ────────────────────────────────────────────── */}
       <footer className="bg-white border-t border-slate-200 pt-14 pb-10">
         <div className="max-w-[1280px] mx-auto px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-6 gap-8 lg:gap-12">
-            {/* Brand */}
             <div className="col-span-2">
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-8 h-8 rounded-lg bg-blue-600 grid place-items-center">
@@ -681,7 +638,7 @@ export default function Home() {
                 <span className="font-bold text-[17px] text-slate-900">NeoBank</span>
               </div>
               <p className="text-[13px] text-slate-500 leading-relaxed max-w-xs">
-                India&apos;s fastest-growing digital wallet. Instant transfers, smart payouts, and premium banking — all in one place.
+                India&apos;s fastest-growing digital wallet. Instant transfers, smart payouts, and premium banking â€” all in one place.
               </p>
               <div className="flex items-center gap-4 mt-5">
                 {[
@@ -697,18 +654,53 @@ export default function Home() {
             </div>
 
             {[
-              { title: "PRODUCT", links: ["Wallet", "Transfers", "Payouts", "Premium", "Analytics"] },
-              { title: "RESOURCES", links: ["Documentation", "API Reference", "Blog", "Support", "Status"] },
-              { title: "COMPANY", links: ["About Us", "Careers", "Press", "Contact", "Partners"] },
-              { title: "LEGAL", links: ["Privacy Policy", "Terms of Use", "Security", "Compliance"] },
+              {
+                title: "PRODUCT",
+                links: [
+                  { label: "Wallet", href: "/dashboard/wallet" },
+                  { label: "Transfers", href: "/dashboard/transfer" },
+                  { label: "Payouts", href: "/dashboard/payout" },
+                  { label: "Premium", href: "/dashboard/premium" },
+                  { label: "History", href: "/dashboard/history" },
+                ],
+              },
+              {
+                title: "QUICK LINKS",
+                links: [
+                  { label: "Dashboard", href: "/dashboard" },
+                  { label: "Top Up", href: "/dashboard/topup" },
+                  { label: "Settings", href: "/dashboard/settings" },
+                  { label: "Sign Up", href: "/signup" },
+                  { label: "Login", href: "/login" },
+                ],
+              },
+              {
+                title: "FEATURES",
+                links: [
+                  { label: "Digital Wallet", href: "#features" },
+                  { label: "Instant Transfers", href: "#features" },
+                  { label: "Bank Payouts", href: "#features" },
+                  { label: "Live Analytics", href: "#features" },
+                  { label: "Pricing", href: "#pricing" },
+                ],
+              },
+              {
+                title: "LEGAL",
+                links: [
+                  { label: "Privacy Policy", href: "#" },
+                  { label: "Terms of Use", href: "#" },
+                  { label: "Security", href: "#" },
+                  { label: "Compliance", href: "#" },
+                ],
+              },
             ].map((col) => (
               <div key={col.title}>
                 <h4 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-4">{col.title}</h4>
                 <ul className="space-y-2.5">
                   {col.links.map((link) => (
-                    <li key={link}>
-                      <Link href="#" className="text-[13px] text-slate-600 hover:text-blue-600 transition-colors">
-                        {link}
+                    <li key={link.label}>
+                      <Link href={link.href} className="text-[13px] text-slate-600 hover:text-blue-600 transition-colors">
+                        {link.label}
                       </Link>
                     </li>
                   ))}

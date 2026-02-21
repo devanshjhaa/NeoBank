@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -45,9 +45,9 @@ export default function VerifyOtpPage() {
     }
     setIsLoading(true);
     try {
-      await authApi.requestOtp(phone);
+      await authApi.requestOtp({ email, phone });
       toast.success("OTP sent!", {
-        description: `We sent a 6-digit code to +91 ${phone}`,
+        description: `We sent a 6-digit code to ${email}`,
       });
       setStep("otp");
       setCooldown(30);
@@ -119,7 +119,7 @@ export default function VerifyOtpPage() {
     if (cooldown > 0) return;
     setIsLoading(true);
     try {
-      await authApi.requestOtp(phone);
+      await authApi.requestOtp({ email, phone });
       setCooldown(30);
       toast.success("OTP resent!");
     } catch {
@@ -131,7 +131,6 @@ export default function VerifyOtpPage() {
 
   return (
     <div className="min-h-screen flex">
-      {/* Left Panel */}
       <div className="hidden lg:flex lg:w-[55%] relative bg-[#0f172a] overflow-hidden">
         <div className="absolute top-20 left-10 w-[400px] h-[400px] bg-blue-600/25 rounded-full blur-[120px]" />
         <div className="absolute bottom-20 right-10 w-[350px] h-[350px] bg-indigo-600/20 rounded-full blur-[100px]" />
@@ -164,7 +163,7 @@ export default function VerifyOtpPage() {
               <span className="text-blue-400">wallet</span>
             </h2>
             <p className="mt-5 text-slate-400 text-base leading-relaxed">
-              Phone verification adds an extra layer of security to your account.
+              We&apos;ll send a verification code to your email to confirm your phone number.
               Your wallet will be activated instantly after verification.
             </p>
 
@@ -213,7 +212,6 @@ export default function VerifyOtpPage() {
         </div>
       </div>
 
-      {/* Right Panel */}
       <div className="w-full lg:w-[45%] flex items-center justify-center bg-white px-6 py-12 sm:px-12">
         <div className="w-full max-w-[440px]">
           <div className="lg:hidden mb-8">
@@ -227,7 +225,6 @@ export default function VerifyOtpPage() {
             </Link>
           </div>
 
-          {/* Step indicator */}
           <div className="flex items-center gap-2 mb-6">
             <div className="flex items-center gap-1.5">
               <div className="h-6 w-6 rounded-full bg-emerald-100 text-emerald-600 grid place-items-center">
@@ -255,12 +252,12 @@ export default function VerifyOtpPage() {
 
           <div className="mb-8">
             <h1 className="text-2xl font-bold text-slate-900">
-              {step === "phone" ? "Verify your phone" : "Enter verification code"}
+              {step === "phone" ? "Link your phone number" : "Check your email"}
             </h1>
             <p className="mt-2 text-sm text-slate-500">
               {step === "phone"
-                ? "We'll send a 6-digit code to verify your identity"
-                : `Enter the code sent to +91 ${phone}`}
+                ? "Enter your phone number to link it to your account. We'll send a verification code to your email."
+                : `We sent a 6-digit code to ${email}`}
             </p>
           </div>
 
@@ -301,12 +298,12 @@ export default function VerifyOtpPage() {
                     Sending...
                   </span>
                 ) : (
-                  "Send verification code"
+                  "Send code to my email"
                 )}
               </Button>
 
               <p className="text-xs text-slate-400 text-center">
-                Standard messaging rates may apply
+                A 6-digit code will be sent to <span className="font-medium text-slate-500">{email}</span>
               </p>
             </div>
           ) : (

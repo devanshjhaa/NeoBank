@@ -108,10 +108,10 @@ export const authApi = {
       body: JSON.stringify(data),
     }),
 
-  requestOtp: (phone: string) =>
+  requestOtp: (data: { email: string; phone: string }) =>
     request<void>("/auth/request-otp", {
       method: "POST",
-      body: JSON.stringify({ phone }),
+      body: JSON.stringify(data),
     }),
 
   verifyOtp: (data: { email: string; phone: string; otp: string }) =>

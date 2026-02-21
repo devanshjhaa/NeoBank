@@ -1,56 +1,44 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { premiumApi } from "@/lib/api";
 import { toast } from "sonner";
 
 const benefits = [
   {
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <line x1="12" y1="1" x2="12" y2="23"/>
-        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-      </svg>
-    ),
+    icon: "M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6",
     title: "Zero Transfer Fees",
     description: "Send money to anyone without paying fees on any transfer",
+    color: "text-emerald-600",
+    bg: "bg-emerald-50",
   },
   {
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
-        <polyline points="17 6 23 6 23 12"/>
-      </svg>
-    ),
+    icon: "M23 6L13.5 15.5 8.5 10.5 1 18M17 6h6v6",
     title: "Higher Limits",
     description: "Enjoy increased transaction and payout limits",
+    color: "text-blue-600",
+    bg: "bg-blue-50",
   },
   {
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-      </svg>
-    ),
+    icon: "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z",
     title: "Priority Support",
     description: "Get faster responses from our dedicated support team",
+    color: "text-violet-600",
+    bg: "bg-violet-50",
   },
   {
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-      </svg>
-    ),
+    icon: "M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27l6.91-1.01L12 2z",
     title: "Exclusive Rewards",
     description: "Earn more cashback and access special promotions",
+    color: "text-amber-600",
+    bg: "bg-amber-50",
   },
 ];
 
 const features = [
   "Zero fees on all transfers",
-  "Higher transaction limits (up to ₹5,00,000)",
+  "Higher transaction limits (up to â‚¹5,00,000)",
   "Priority customer support",
   "Early access to new features",
   "Premium badge on your profile",
@@ -82,71 +70,79 @@ export default function PremiumPage() {
   };
 
   return (
-    <div className="space-y-8">
-      <div className="text-center max-w-2xl mx-auto">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-sm font-medium mb-4">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+    <div className="space-y-8 max-w-3xl mx-auto">
+      <div className="text-center">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-amber-50 to-orange-50 ring-1 ring-amber-200/50 text-amber-700 text-[12px] font-semibold mb-4">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
           </svg>
           Premium
         </div>
-        <h1 className="text-3xl font-bold text-slate-900 font-[family-name:var(--font-gabarito)]">
-          Upgrade to Premium
-        </h1>
-        <p className="text-slate-500 mt-2">
+        <h1 className="text-[26px] font-bold text-slate-900 tracking-tight">Upgrade to Premium</h1>
+        <p className="text-[14px] text-slate-500 mt-1.5 max-w-md mx-auto">
           Unlock exclusive features and enjoy zero fees on all transactions
         </p>
       </div>
 
-      <Card className="max-w-lg mx-auto border-blue-200">
-        <CardContent className="p-8 space-y-6">
-          <div className="text-center">
-            <div className="flex items-baseline justify-center gap-1">
-              <span className="text-5xl font-bold text-slate-900">₹299</span>
-              <span className="text-slate-400">/one-time</span>
-            </div>
-            <p className="text-slate-500 mt-2">Lifetime premium access</p>
+      <div className="bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-sm shadow-slate-200/40 max-w-md mx-auto">
+        <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-700 p-8 text-center">
+          <div className="flex items-baseline justify-center gap-1.5">
+            <span className="text-5xl font-bold text-white tracking-tight">â‚¹299</span>
+            <span className="text-blue-200 text-[14px] font-medium">/one-time</span>
           </div>
+          <p className="text-blue-100 text-[13px] mt-2">Lifetime premium access â€” pay once, enjoy forever</p>
+        </div>
 
+        <div className="p-6 space-y-6">
           <ul className="space-y-3">
             {features.map((feature, index) => (
-              <li key={index} className="flex items-center gap-3 text-sm">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0">
-                  <polyline points="20 6 9 17 4 12"/>
-                </svg>
-                <span className="text-slate-600">{feature}</span>
+              <li key={index} className="flex items-center gap-3">
+                <div className="w-5 h-5 rounded-full bg-emerald-50 flex items-center justify-center shrink-0">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </div>
+                <span className="text-[13px] text-slate-600">{feature}</span>
               </li>
             ))}
           </ul>
 
-          <Button
-            className="w-full h-12"
+          <button
             onClick={handleUpgrade}
             disabled={isUpgrading}
-            loading={isUpgrading}
+            className="w-full h-12 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-[14px] font-semibold transition-all shadow-sm shadow-blue-600/20 disabled:opacity-50 flex items-center justify-center gap-2"
           >
+            {isUpgrading && (
+              <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+              </svg>
+            )}
             Upgrade Now
-          </Button>
-        </CardContent>
-      </Card>
+          </button>
+        </div>
+      </div>
 
-      <div className="max-w-3xl mx-auto">
-        <h2 className="text-lg font-semibold text-slate-900 mb-4 text-center">
+      <div>
+        <h2 className="text-[15px] font-semibold text-slate-900 mb-4 text-center tracking-tight">
           What You&apos;ll Get
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {benefits.map((benefit, index) => (
-            <Card key={index}>
-              <CardContent className="p-6 flex items-start gap-4">
-                <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0 text-blue-600">
-                  {benefit.icon}
-                </div>
-                <div>
-                  <h3 className="font-medium text-slate-900">{benefit.title}</h3>
-                  <p className="text-sm text-slate-500 mt-1">{benefit.description}</p>
-                </div>
-              </CardContent>
-            </Card>
+            <div
+              key={index}
+              className="group bg-white rounded-xl border border-slate-200/80 p-5 flex items-start gap-4 hover:shadow-md hover:shadow-slate-200/60 transition-all"
+            >
+              <div className={`w-11 h-11 rounded-xl ${benefit.bg} flex items-center justify-center shrink-0 ${benefit.color} group-hover:scale-110 transition-transform`}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d={benefit.icon} />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-[13px] font-semibold text-slate-900">{benefit.title}</h3>
+                <p className="text-[12px] text-slate-500 mt-0.5 leading-relaxed">{benefit.description}</p>
+              </div>
+            </div>
           ))}
         </div>
       </div>

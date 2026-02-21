@@ -58,8 +58,8 @@ public class AuthService {
         return jwtProvider.createToken(user.getId(), user.getEmail(), user.getTier());
     }
 
-    public void requestOtp(String phone) {
-        otpService.sendOtp(phone);
+    public void requestOtp(String email, String phone) {
+        otpService.sendOtp(email, phone);
     }
 
     @Transactional

@@ -12,7 +12,7 @@ public class TestOtpConfig {
         return new OtpService(null, null) {
 
             @Override
-            public void sendOtp(String phone) {
+            public void sendOtp(String email, String phone) {
             }
 
             @Override

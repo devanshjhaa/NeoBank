@@ -4,9 +4,9 @@ services:
     image: postgres:16
     container_name: neobank-postgres
     environment:
-      POSTGRES_DB: neobank
-      POSTGRES_USER: neobank
-      POSTGRES_PASSWORD: neobank
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       TZ: UTC
     ports:
       - "5433:5432"
@@ -38,14 +38,16 @@ services:
       redis:
         condition: service_healthy
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/neobank?options=-c%20TimeZone=UTC
-      SPRING_DATASOURCE_USERNAME: neobank
-      SPRING_DATASOURCE_PASSWORD: neobank
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}?options=-c%20TimeZone=UTC
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
-      JWT_SECRET: dev-secret-key-dev-secret-key-dev-secret-key
-      FAST2SMS_API_KEY: dummy-dev-key
-      RESEND_API_KEY: dummy-dev-key
+      JWT_SECRET: ${JWT_SECRET}
+      FAST2SMS_API_KEY: ${FAST2SMS_API_KEY}
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      RAZORPAY_KEY_ID: ${RAZORPAY_KEY_ID}
+      RAZORPAY_KEY_SECRET: ${RAZORPAY_KEY_SECRET}
     ports:
       - "8081:8081"
 

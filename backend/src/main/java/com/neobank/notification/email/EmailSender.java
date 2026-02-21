@@ -16,6 +16,7 @@ public class EmailSender {
     public void send(String to, String subject, String body) {
 
         SimpleMailMessage msg = new SimpleMailMessage();
+        msg.setFrom("NeoBank <onboarding@resend.dev>");
         msg.setTo(to);
         msg.setSubject(subject);
         msg.setText(body);

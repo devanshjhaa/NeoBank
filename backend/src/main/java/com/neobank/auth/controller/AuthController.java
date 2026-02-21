@@ -28,7 +28,7 @@ public class AuthController {
 
     @PostMapping("/request-otp")
     public void requestOtp(@Valid @RequestBody RequestOtpRequest req) {
-        authService.requestOtp(req.phone());
+        authService.requestOtp(req.email(), req.phone());
     }
 
     @PostMapping("/verify-otp")

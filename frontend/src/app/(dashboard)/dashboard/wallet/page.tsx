@@ -1,8 +1,6 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { walletApi, type WalletResponse } from "@/lib/api";
 import { formatCurrency } from "@/lib/utils";
 import { toast } from "sonner";
@@ -30,166 +28,164 @@ export default function WalletPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <svg className="animate-spin h-8 w-8 text-blue-600" viewBox="0 0 24 24">
-          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-        </svg>
+      <div className="space-y-6 animate-pulse">
+        <div className="h-7 w-32 bg-slate-200 rounded-lg" />
+        <div className="bg-white rounded-2xl border border-slate-100 h-[220px]" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="bg-white rounded-xl border border-slate-100 h-[90px]" />
+          ))}
+        </div>
       </div>
     );
   }
 
+  const actions = [
+    {
+      href: "/dashboard/topup",
+      label: "Top Up",
+      desc: "Add funds to wallet",
+      bg: "bg-emerald-50 group-hover:bg-emerald-100",
+      stroke: "#059669",
+      icon: (
+        <>
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </>
+      ),
+    },
+    {
+      href: "/dashboard/transfer",
+      label: "Send Money",
+      desc: "Transfer to a user",
+      bg: "bg-blue-50 group-hover:bg-blue-100",
+      stroke: "#2563eb",
+      icon: (
+        <>
+          <line x1="22" y1="2" x2="11" y2="13" />
+          <polygon points="22 2 15 22 11 13 2 9 22 2" />
+        </>
+      ),
+    },
+    {
+      href: "/dashboard/payout",
+      label: "Payout",
+      desc: "Withdraw to bank",
+      bg: "bg-violet-50 group-hover:bg-violet-100",
+      stroke: "#7c3aed",
+      icon: (
+        <>
+          <line x1="12" y1="19" x2="12" y2="5" />
+          <polyline points="5 12 12 5 19 12" />
+        </>
+      ),
+    },
+  ];
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900 font-[family-name:var(--font-gabarito)]">
-          My Wallet
-        </h1>
-        <p className="text-slate-500 mt-1">
-          Manage your digital wallet and view your balance
-        </p>
+        <h1 className="text-[22px] font-bold text-slate-900 tracking-tight">My Wallet</h1>
+        <p className="text-[13px] text-slate-500 mt-0.5">Manage your digital wallet and funds</p>
       </div>
 
-      <Card className="bg-gradient-to-br from-blue-600 to-blue-800 text-white border-0 overflow-hidden relative">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-[100px]" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full blur-[80px]" />
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-700 p-6 lg:p-8 text-white">
+        <div className="absolute -top-16 -right-16 w-48 h-48 bg-white/10 rounded-full blur-3xl" />
+        <div className="absolute -bottom-12 -left-12 w-36 h-36 bg-white/5 rounded-full blur-2xl" />
 
-        <CardContent className="relative z-10 p-8">
-          <div className="flex items-center justify-between mb-8">
+        <div className="relative z-10">
+          <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/>
+              <div className="w-10 h-10 bg-white/15 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
+                  <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
+                  <path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
                 </svg>
               </div>
               <div>
-                <p className="text-lg font-semibold">NeoBank Wallet</p>
-                <p className="text-sm text-white/60">Digital Wallet</p>
+                <p className="text-[15px] font-semibold">NeoBank Wallet</p>
+                <p className="text-[12px] text-white/60">Digital Wallet</p>
               </div>
             </div>
-            <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+            <span className={`px-3 py-1 rounded-full text-[11px] font-semibold ${
               wallet?.status === "ACTIVE"
-                ? "bg-emerald-400/20 text-emerald-200"
-                : "bg-red-400/20 text-red-200"
+                ? "bg-emerald-400/20 text-emerald-200 ring-1 ring-emerald-400/30"
+                : "bg-red-400/20 text-red-200 ring-1 ring-red-400/30"
             }`}>
               {wallet?.status || "UNKNOWN"}
             </span>
           </div>
 
           <div className="mb-8">
-            <p className="text-sm text-white/60 mb-2">Available Balance</p>
-            <h2 className="text-5xl font-bold font-[family-name:var(--font-gabarito)]">
+            <p className="text-[12px] text-white/50 font-medium mb-1">Available Balance</p>
+            <h2 className="text-[40px] font-bold tracking-tight leading-none">
               {formatCurrency(wallet?.balance || 0, wallet?.currency || "INR")}
             </h2>
           </div>
 
-          <div className="flex flex-wrap gap-3">
-            <Link href="/dashboard/topup">
-              <Button className="gap-2 bg-white text-blue-700 hover:bg-white/90">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="12" y1="5" x2="12" y2="19"/>
-                  <line x1="5" y1="12" x2="19" y2="12"/>
-                </svg>
-                Top Up
-              </Button>
-            </Link>
-            <Link href="/dashboard/transfer">
-              <Button variant="outline" className="gap-2 border-white/20 text-white hover:bg-white/10 hover:text-white">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="22" y1="2" x2="11" y2="13"/>
-                  <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-                </svg>
-                Transfer
-              </Button>
-            </Link>
-            <Link href="/dashboard/payout">
-              <Button variant="outline" className="gap-2 border-white/20 text-white hover:bg-white/10 hover:text-white">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="12" y1="19" x2="12" y2="5"/>
-                  <polyline points="5 12 12 5 19 12"/>
-                </svg>
-                Payout
-              </Button>
-            </Link>
+          <div className="flex flex-wrap gap-2.5">
+            {actions.map((a) => (
+              <Link key={a.href} href={a.href}>
+                <button className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/15 hover:bg-white/25 backdrop-blur-sm text-[13px] font-medium transition-all">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    {a.icon}
+                  </svg>
+                  {a.label}
+                </button>
+              </Link>
+            ))}
           </div>
-        </CardContent>
-      </Card>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="hover:border-blue-300 transition-colors cursor-pointer">
-          <Link href="/dashboard/topup">
-            <CardContent className="p-6 flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="12" y1="5" x2="12" y2="19"/>
-                  <polyline points="19 12 12 19 5 12"/>
-                </svg>
-              </div>
-              <div>
-                <p className="font-medium text-slate-900">Top Up</p>
-                <p className="text-sm text-slate-400">Add funds to wallet</p>
-              </div>
-            </CardContent>
-          </Link>
-        </Card>
-
-        <Card className="hover:border-blue-300 transition-colors cursor-pointer">
-          <Link href="/dashboard/transfer">
-            <CardContent className="p-6 flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="22" y1="2" x2="11" y2="13"/>
-                  <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-                </svg>
-              </div>
-              <div>
-                <p className="font-medium text-slate-900">Transfer</p>
-                <p className="text-sm text-slate-400">Send to another user</p>
-              </div>
-            </CardContent>
-          </Link>
-        </Card>
-
-        <Card className="hover:border-blue-300 transition-colors cursor-pointer">
-          <Link href="/dashboard/payout">
-            <CardContent className="p-6 flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="12" y1="19" x2="12" y2="5"/>
-                  <polyline points="5 12 12 5 19 12"/>
-                </svg>
-              </div>
-              <div>
-                <p className="font-medium text-slate-900">Payout</p>
-                <p className="text-sm text-slate-400">Withdraw to bank</p>
-              </div>
-            </CardContent>
-          </Link>
-        </Card>
+        </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Wallet Details</CardTitle>
-          <CardDescription>Information about your digital wallet</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex justify-between py-3 border-b border-slate-200">
-            <span className="text-slate-500">Wallet ID</span>
-            <span className="font-mono text-slate-900">{wallet?.walletId ?? "N/A"}</span>
-          </div>
-          <div className="flex justify-between py-3 border-b border-slate-200">
-            <span className="text-slate-500">Currency</span>
-            <span className="text-slate-900">{wallet?.currency || "INR"}</span>
-          </div>
-          <div className="flex justify-between py-3">
-            <span className="text-slate-500">Status</span>
-            <span className={`font-medium ${wallet?.status === "ACTIVE" ? "text-emerald-600" : "text-red-600"}`}>
-              {wallet?.status || "Unknown"}
-            </span>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {actions.map((action) => (
+          <Link key={action.href} href={action.href}>
+            <div className="bg-white rounded-xl border border-slate-200/80 p-5 group hover:shadow-md hover:shadow-slate-200/60 transition-all duration-200 cursor-pointer">
+              <div className="flex items-center gap-4">
+                <div className={`w-11 h-11 rounded-xl ${action.bg} flex items-center justify-center transition-colors`}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={action.stroke} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    {action.icon}
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <p className="text-[13px] font-semibold text-slate-900">{action.label}</p>
+                  <p className="text-[11px] text-slate-400">{action.desc}</p>
+                </div>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-slate-300 group-hover:text-slate-400 group-hover:translate-x-0.5 transition-all shrink-0">
+                  <polyline points="9 18 15 12 9 6" />
+                </svg>
+              </div>
+            </div>
+          </Link>
+        ))}
+      </div>
+
+      <div className="bg-white rounded-xl border border-slate-200/80 overflow-hidden">
+        <div className="px-5 py-4 border-b border-slate-100">
+          <h2 className="text-[13px] font-semibold text-slate-900">Wallet Details</h2>
+          <p className="text-[11px] text-slate-400 mt-0.5">Information about your digital wallet</p>
+        </div>
+        <div className="divide-y divide-slate-100">
+          {[
+            { label: "Wallet ID", value: wallet?.walletId ?? "N/A", mono: true },
+            { label: "Currency", value: wallet?.currency || "INR" },
+            {
+              label: "Status",
+              value: wallet?.status || "Unknown",
+              color: wallet?.status === "ACTIVE" ? "text-emerald-600" : "text-red-600",
+            },
+          ].map((row) => (
+            <div key={row.label} className="flex items-center justify-between px-5 py-4">
+              <span className="text-[13px] text-slate-500">{row.label}</span>
+              <span className={`text-[13px] font-semibold ${row.color || "text-slate-900"} ${row.mono ? "font-mono" : ""}`}>
+                {row.value}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
