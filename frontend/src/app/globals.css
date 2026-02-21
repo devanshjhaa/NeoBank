@@ -1,0 +1,118 @@
+@import "tailwindcss";
+@import "locomotive-scroll/dist/locomotive-scroll.css";
+
+/* ============================================
+   NeoBank Design System
+   ============================================ */
+
+@theme inline {
+  /* Colors */
+  --color-primary: #2563eb;
+  --color-primary-foreground: #ffffff;
+  --color-background: #ffffff;
+  --color-foreground: #0f172a;
+  --color-card: #ffffff;
+  --color-card-foreground: #0f172a;
+  --color-muted: #f1f5f9;
+  --color-muted-foreground: #64748b;
+  --color-border: #e2e8f0;
+  --color-input: #e2e8f0;
+  --color-ring: #2563eb;
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #fafafa;
+  --color-secondary: #f1f5f9;
+  --color-secondary-foreground: #0f172a;
+  --color-accent: #f1f5f9;
+  --color-accent-foreground: #0f172a;
+  --color-popover: #ffffff;
+  --color-popover-foreground: #0f172a;
+
+  /* Chart Colors */
+  --color-chart-1: #2563eb;
+  --color-chart-2: #16a34a;
+  --color-chart-3: #f59e0b;
+  --color-chart-4: #7c3aed;
+  --color-chart-5: #ec4899;
+
+  /* Font Families */
+  --font-display: var(--font-gabarito), system-ui, sans-serif;
+  --font-body: var(--font-inter), system-ui, sans-serif;
+
+  /* Border Radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+}
+
+/* ============================================
+   Base Styles
+   ============================================ */
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* ============================================
+   Autofill Styles
+   ============================================ */
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  -webkit-text-fill-color: #0f172a;
+  -webkit-box-shadow: 0 0 0px 1000px #ffffff inset;
+  transition: background-color 5000s ease-in-out 0s, border-color 0.3s ease-in-out;
+}
+
+/* ============================================
+   Remove Number Input Arrows
+   ============================================ */
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* ============================================
+   Custom Scrollbar
+   ============================================ */
+
+.scroll-area::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scroll-area::-webkit-scrollbar-track {
+  background: #ffffff;
+  border-radius: 7px;
+}
+
+.scroll-area::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 7px;
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  .scroll-area {
+    scrollbar-color: #e2e8f0 #ffffff;
+  }
+}
