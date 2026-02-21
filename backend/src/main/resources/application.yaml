@@ -45,7 +45,7 @@ spring.mail:
   host: smtp.resend.com
   port: 465
   username: resend
-  password: ${RESEND_API_KEY}
+  password: ${RESEND_API_KEY:no-key-set}
   properties:
     mail.smtp.auth: true
     mail.smtp.ssl.enable: true
@@ -73,7 +73,7 @@ logging:
 
 sms:
   fast2sms:
-    api-key: ${FAST2SMS_API_KEY}
+    api-key: ${FAST2SMS_API_KEY:no-key-set}
     sender-id: FSTSMS
     route: q
 
