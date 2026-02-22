@@ -2,19 +2,35 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { userApi } from "@/lib/api";
+import type { UserProfileResponse } from "@/lib/api";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
 export default function SettingsPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  const [profile, setProfile] = useState<UserProfileResponse | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const storedEmail = localStorage.getItem("userEmail") || "";
-    setEmail(storedEmail);
+    const fetchProfile = async () => {
+      try {
+        const data = await userApi.getMe();
+        setProfile(data);
+      } catch {
+        /* fallback */
+      }
+      setIsLoading(false);
+    };
+    fetchProfile();
   }, []);
 
+  const email = profile?.email || localStorage.getItem("userEmail") || "";
+  const phone = profile?.phone || "";
+  const phoneVerified = profile?.phoneVerified ?? false;
+  const tier = profile?.tier || "FREE";
+  const authProvider = profile?.authProvider || "EMAIL";
   const initials = email ? email.charAt(0).toUpperCase() : "U";
 
   const handleLogout = () => {
@@ -36,6 +52,13 @@ export default function SettingsPage() {
         <p className="text-[13px] text-slate-500 mt-0.5">Manage your account settings and preferences</p>
       </div>
 
+      {isLoading ? (
+        <div className="animate-pulse space-y-4">
+          <div className="bg-white rounded-xl border border-slate-100 p-5 h-[180px]" />
+          <div className="bg-white rounded-xl border border-slate-100 p-5 h-[120px]" />
+        </div>
+      ) : (
+      <>
       <div className="bg-white rounded-xl border border-slate-200/80 overflow-hidden">
         <div className="px-5 py-4 border-b border-slate-100">
           <h2 className="text-[13px] font-semibold text-slate-900">Profile</h2>
@@ -48,7 +71,14 @@ export default function SettingsPage() {
             </div>
             <div>
               <p className="text-[14px] font-semibold text-slate-900">{email || "No email"}</p>
-              <p className="text-[12px] text-slate-400 mt-0.5">NeoBank Member</p>
+              <div className="flex items-center gap-2 mt-0.5">
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${tier === "PREMIUM" || tier === "ADMIN" ? "bg-amber-50 text-amber-700 ring-1 ring-amber-200/50" : "bg-slate-100 text-slate-600 ring-1 ring-slate-200/50"}`}>
+                  {tier}
+                </span>
+                <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-[10px] font-semibold ring-1 ring-blue-200/50">
+                  {authProvider === "GOOGLE" ? "Google" : "Email"}
+                </span>
+              </div>
             </div>
           </div>
 
@@ -71,6 +101,18 @@ export default function SettingsPage() {
             </div>
             <p className="text-[11px] text-slate-400">Email is set during registration and cannot be changed</p>
           </div>
+
+          {phone && (
+            <div className="space-y-2">
+              <Label className="text-[13px] font-medium text-slate-700">Phone</Label>
+              <Input
+                type="text"
+                value={phone}
+                disabled
+                className="rounded-xl bg-slate-50 border-slate-200"
+              />
+            </div>
+          )}
         </div>
       </div>
 
@@ -96,10 +138,10 @@ export default function SettingsPage() {
           <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 ring-1 ring-slate-100">
             <div>
               <p className="text-[13px] font-semibold text-slate-900">Phone Verification</p>
-              <p className="text-[12px] text-slate-400 mt-0.5">Verified via OTP during signup</p>
+              <p className="text-[12px] text-slate-400 mt-0.5">{phone ? `Phone: ${phone}` : "No phone on file"}</p>
             </div>
-            <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-semibold ring-1 ring-emerald-200/50">
-              Verified
+            <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold ring-1 ${phoneVerified ? "bg-emerald-50 text-emerald-700 ring-emerald-200/50" : "bg-amber-50 text-amber-700 ring-amber-200/50"}`}>
+              {phoneVerified ? "Verified" : "Not verified"}
             </span>
           </div>
         </div>
@@ -160,6 +202,8 @@ export default function SettingsPage() {
           </div>
         </div>
       </div>
+      </>
+      )}
     </div>
   );
 }

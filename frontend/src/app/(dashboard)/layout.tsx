@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import { LogoIcon } from "@/components/logo";
+import { userApi } from "@/lib/api";
 
 const mainNav = [
   {
@@ -129,6 +130,7 @@ export default function DashboardLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [ready, setReady] = useState(false);
   const [userEmail, setUserEmail] = useState("");
+  const [userTier, setUserTier] = useState("");
 
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken");
@@ -138,6 +140,16 @@ export default function DashboardLayout({
     }
     setUserEmail(localStorage.getItem("userEmail") || "");
     setReady(true);
+
+    userApi.getMe()
+      .then((profile) => {
+        setUserTier(profile.tier || "FREE");
+        if (profile.email) {
+          setUserEmail(profile.email);
+          localStorage.setItem("userEmail", profile.email);
+        }
+      })
+      .catch(() => {});
   }, [router]);
 
   const handleLogout = useCallback(() => {
@@ -227,34 +239,38 @@ export default function DashboardLayout({
             })}
           </div>
 
-          <div className="my-4 mx-3 border-t border-slate-100" />
+          {userTier === "ADMIN" && (
+            <>
+              <div className="my-4 mx-3 border-t border-slate-100" />
 
-          <p className="px-3 pt-1 pb-2 text-[10.5px] font-semibold text-slate-400 uppercase tracking-[0.08em]">
-            Admin
-          </p>
-          <div className="space-y-0.5">
-            {adminNav.map((item) => {
-              const active = isActive(item.href);
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setSidebarOpen(false)}
-                  className={cn(
-                    "flex items-center gap-3 px-3 py-[9px] rounded-lg text-[13px] font-medium transition-all duration-150 group",
-                    active
-                      ? "bg-blue-600 text-white shadow-sm shadow-blue-600/20"
-                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-                  )}
-                >
-                  <span className={cn("shrink-0 transition-colors", active ? "text-white" : "text-slate-400 group-hover:text-slate-500")}>
-                    {item.icon}
-                  </span>
-                  {item.label}
-                </Link>
-              );
-            })}
-          </div>
+              <p className="px-3 pt-1 pb-2 text-[10.5px] font-semibold text-slate-400 uppercase tracking-[0.08em]">
+                Admin
+              </p>
+              <div className="space-y-0.5">
+                {adminNav.map((item) => {
+                  const active = isActive(item.href);
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setSidebarOpen(false)}
+                      className={cn(
+                        "flex items-center gap-3 px-3 py-[9px] rounded-lg text-[13px] font-medium transition-all duration-150 group",
+                        active
+                          ? "bg-blue-600 text-white shadow-sm shadow-blue-600/20"
+                          : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                      )}
+                    >
+                      <span className={cn("shrink-0 transition-colors", active ? "text-white" : "text-slate-400 group-hover:text-slate-500")}>
+                        {item.icon}
+                      </span>
+                      {item.label}
+                    </Link>
+                  );
+                })}
+              </div>
+            </>
+          )}
 
           <div className="my-4 mx-3 border-t border-slate-100" />
 
@@ -315,7 +331,7 @@ export default function DashboardLayout({
               <p className="text-[13px] font-semibold text-slate-900 truncate">
                 {userEmail || "User"}
               </p>
-              <p className="text-[11px] text-slate-400">Free plan</p>
+              <p className="text-[11px] text-slate-400">{userTier === "PREMIUM" || userTier === "ADMIN" ? "Premium" : "Free plan"}</p>
             </div>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-slate-300 shrink-0">
               <polyline points="6 9 12 15 18 9" />

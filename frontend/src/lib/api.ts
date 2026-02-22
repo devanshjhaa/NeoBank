@@ -92,6 +92,27 @@ export interface WalletSummary {
   createdAt: string;
 }
 
+export interface UserProfileResponse {
+  id: number;
+  email: string;
+  phone: string;
+  phoneVerified: boolean;
+  status: string;
+  tier: string;
+  authProvider: string;
+  createdAt: string;
+}
+
+export interface LedgerEntryResponse {
+  id: number;
+  amount: number;
+  direction: string;
+  txnType: string;
+  referenceId: string;
+  description: string;
+  createdAt: string;
+}
+
 /* ------------------------------------------------------------------ */
 /*  Auth                                                               */
 /* ------------------------------------------------------------------ */
@@ -134,6 +155,22 @@ export const authApi = {
 
 export const walletApi = {
   getMyWallet: () => request<WalletResponse>("/wallet/me"),
+};
+
+/* ------------------------------------------------------------------ */
+/*  User Profile                                                       */
+/* ------------------------------------------------------------------ */
+
+export const userApi = {
+  getMe: () => request<UserProfileResponse>("/users/me"),
+};
+
+/* ------------------------------------------------------------------ */
+/*  Transaction History                                                */
+/* ------------------------------------------------------------------ */
+
+export const transactionApi = {
+  getHistory: () => request<LedgerEntryResponse[]>("/transactions/history"),
 };
 
 /* ------------------------------------------------------------------ */

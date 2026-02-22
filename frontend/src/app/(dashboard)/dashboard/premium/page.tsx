@@ -1,8 +1,8 @@
 ﻿"use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { premiumApi } from "@/lib/api";
+import { premiumApi, userApi } from "@/lib/api";
 import { toast } from "sonner";
 
 const benefits = [
@@ -38,7 +38,7 @@ const benefits = [
 
 const features = [
   "Zero fees on all transfers",
-  "Higher transaction limits (up to â‚¹5,00,000)",
+  "Higher transaction limits (up to \u20B95,00,000)",
   "Priority customer support",
   "Early access to new features",
   "Premium badge on your profile",
@@ -48,6 +48,19 @@ const features = [
 export default function PremiumPage() {
   const router = useRouter();
   const [isUpgrading, setIsUpgrading] = useState(false);
+  const [alreadyPremium, setAlreadyPremium] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    userApi.getMe()
+      .then((profile) => {
+        if (profile.tier === "PREMIUM" || profile.tier === "ADMIN") {
+          setAlreadyPremium(true);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
 
   const handleUpgrade = async () => {
     setIsUpgrading(true);
@@ -69,6 +82,39 @@ export default function PremiumPage() {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <svg className="animate-spin h-6 w-6 text-blue-600" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+        </svg>
+      </div>
+    );
+  }
+
+  if (alreadyPremium) {
+    return (
+      <div className="max-w-md mx-auto text-center py-16 space-y-4">
+        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center mx-auto shadow-lg shadow-amber-200/50">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+          </svg>
+        </div>
+        <h1 className="text-[22px] font-bold text-slate-900 tracking-tight">You&apos;re Already Premium</h1>
+        <p className="text-[14px] text-slate-500">
+          You have lifetime premium access with all exclusive features unlocked.
+        </p>
+        <button
+          onClick={() => router.push("/dashboard")}
+          className="mt-4 h-11 px-6 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-[14px] font-semibold transition-all shadow-sm shadow-blue-600/20"
+        >
+          Back to Dashboard
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8 max-w-3xl mx-auto">
       <div className="text-center">
@@ -87,10 +133,10 @@ export default function PremiumPage() {
       <div className="bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-sm shadow-slate-200/40 max-w-md mx-auto">
         <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-700 p-8 text-center">
           <div className="flex items-baseline justify-center gap-1.5">
-            <span className="text-5xl font-bold text-white tracking-tight">â‚¹299</span>
+            <span className="text-5xl font-bold text-white tracking-tight">{"\u20B9"}299</span>
             <span className="text-blue-200 text-[14px] font-medium">/one-time</span>
           </div>
-          <p className="text-blue-100 text-[13px] mt-2">Lifetime premium access â€” pay once, enjoy forever</p>
+          <p className="text-blue-100 text-[13px] mt-2">Lifetime premium access {"\u2014"} pay once, enjoy forever</p>
         </div>
 
         <div className="p-6 space-y-6">
@@ -118,7 +164,7 @@ export default function PremiumPage() {
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
               </svg>
             )}
-            Upgrade Now
+            Upgrade to Premium
           </button>
         </div>
       </div>

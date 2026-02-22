@@ -18,7 +18,7 @@ const payoutSchema = z.object({
   amount: z.string()
     .min(1, "Amount is required")
     .refine((val) => !isNaN(Number(val)) && Number(val) > 0, "Amount must be greater than 0")
-    .refine((val) => Number(val) >= 100, "Minimum payout amount is â‚¹100"),
+    .refine((val) => Number(val) >= 100, "Minimum payout amount is \u20B9100"),
 });
 
 type PayoutFormData = z.infer<typeof payoutSchema>;
@@ -194,7 +194,7 @@ export default function PayoutPage() {
               <Label htmlFor="amount" className="text-[13px] font-medium text-slate-700">Amount</Label>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-semibold text-lg">
-                  â‚¹
+                  \u20B9
                 </span>
                 <Input
                   id="amount"
@@ -210,7 +210,7 @@ export default function PayoutPage() {
               {errors.amount && (
                 <p className="text-[12px] text-red-600 font-medium">{errors.amount.message}</p>
               )}
-              <p className="text-[11px] text-slate-400">Min: â‚¹100</p>
+              <p className="text-[11px] text-slate-400">Min: \u20B9100</p>
             </div>
 
             {amount && Number(amount) > 0 && (

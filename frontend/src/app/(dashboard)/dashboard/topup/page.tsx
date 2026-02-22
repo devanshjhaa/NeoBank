@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,12 +11,18 @@ import { topupApi } from "@/lib/api";
 import { formatCurrency } from "@/lib/utils";
 import { toast } from "sonner";
 
+declare global {
+  interface Window {
+    Razorpay: new (options: Record<string, unknown>) => { open: () => void };
+  }
+}
+
 const topupSchema = z.object({
   amount: z.string()
     .min(1, "Amount is required")
     .refine((val) => !isNaN(Number(val)) && Number(val) > 0, "Amount must be greater than 0")
-    .refine((val) => Number(val) >= 10, "Minimum top-up amount is â‚¹10")
-    .refine((val) => Number(val) <= 100000, "Maximum top-up amount is â‚¹1,00,000"),
+    .refine((val) => Number(val) >= 10, "Minimum top-up amount is \u20B910")
+    .refine((val) => Number(val) <= 100000, "Maximum top-up amount is \u20B91,00,000"),
 });
 
 type TopupFormData = z.infer<typeof topupSchema>;
@@ -27,6 +33,19 @@ export default function TopupPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
+  const [razorpayReady, setRazorpayReady] = useState(false);
+
+  useEffect(() => {
+    if (document.querySelector('script[src*="razorpay"]')) {
+      setRazorpayReady(true);
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    script.onload = () => setRazorpayReady(true);
+    document.body.appendChild(script);
+  }, []);
 
   const {
     register,
@@ -45,32 +64,53 @@ export default function TopupPage() {
     setValue("amount", amt.toString(), { shouldValidate: true });
   };
 
-  const onSubmit = async (data: TopupFormData) => {
-    setIsLoading(true);
-    try {
+  const onSubmit = useCallback(
+    async (data: TopupFormData) => {
+      if (!razorpayReady || !window.Razorpay) {
+        toast.error("Payment gateway is still loading. Please wait.");
+        return;
+      }
+      setIsLoading(true);
+      const amountInPaise = Number(data.amount) * 100;
       const idempotencyKey = crypto.randomUUID();
-      const gatewayRef = `PAY-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
-      await topupApi.confirm({
-        amount: Number(data.amount),
-        idempotencyKey,
-        gatewayRef,
-      });
+      const options: Record<string, unknown> = {
+        key: "rzp_test_SIu1PYqOQfxM0K",
+        amount: amountInPaise,
+        currency: "INR",
+        name: "NeoBank",
+        description: "Wallet Top-up",
+        handler: async (response: { razorpay_payment_id: string }) => {
+          try {
+            await topupApi.confirm({
+              amount: Number(data.amount),
+              idempotencyKey,
+              gatewayRef: response.razorpay_payment_id,
+            });
+            toast.success("Top-up successful!", {
+              description: `${formatCurrency(Number(data.amount))} has been added to your wallet.`,
+            });
+            router.push("/dashboard");
+          } catch (error: unknown) {
+            const apiError = error as { message?: string };
+            toast.error("Top-up confirmation failed", {
+              description: apiError.message || "Payment was captured but wallet update failed. Contact support.",
+            });
+          } finally {
+            setIsLoading(false);
+          }
+        },
+        modal: {
+          ondismiss: () => setIsLoading(false),
+        },
+        theme: { color: "#2563eb" },
+      };
 
-      toast.success("Top-up successful!", {
-        description: `${formatCurrency(Number(data.amount))} has been added to your wallet.`,
-      });
-
-      router.push("/dashboard");
-    } catch (error: unknown) {
-      const apiError = error as { message?: string };
-      toast.error("Top-up failed", {
-        description: apiError.message || "Please try again later.",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    },
+    [razorpayReady, router],
+  );
 
   return (
     <div className="space-y-6 max-w-2xl">
@@ -99,7 +139,7 @@ export default function TopupPage() {
                       : "bg-slate-50 text-slate-600 hover:bg-slate-100 ring-1 ring-slate-200"
                   }`}
                 >
-                  â‚¹{amt.toLocaleString("en-IN")}
+                  \u20B9{amt.toLocaleString("en-IN")}
                 </button>
               ))}
             </div>
@@ -108,7 +148,7 @@ export default function TopupPage() {
               <Label htmlFor="amount" className="text-[13px] font-medium text-slate-700">Custom Amount</Label>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-semibold text-lg">
-                  â‚¹
+                  \u20B9
                 </span>
                 <Input
                   id="amount"
@@ -130,7 +170,7 @@ export default function TopupPage() {
                 <p className="text-[12px] text-red-600 font-medium">{errors.amount.message}</p>
               )}
               <p className="text-[11px] text-slate-400">
-                Min: â‚¹10 &bull; Max: â‚¹1,00,000
+                Min: \u20B910 &bull; Max: \u20B91,00,000
               </p>
             </div>
 

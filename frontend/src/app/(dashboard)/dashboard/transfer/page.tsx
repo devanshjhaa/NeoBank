@@ -18,7 +18,7 @@ const transferSchema = z.object({
   amount: z.string()
     .min(1, "Amount is required")
     .refine((val) => !isNaN(Number(val)) && Number(val) > 0, "Amount must be greater than 0")
-    .refine((val) => Number(val) >= 1, "Minimum transfer amount is â‚¹1"),
+    .refine((val) => Number(val) >= 1, "Minimum transfer amount is \u20B91"),
 });
 
 type TransferFormData = z.infer<typeof transferSchema>;
@@ -204,7 +204,7 @@ export default function TransferPage() {
               <Label htmlFor="amount" className="text-[13px] font-medium text-slate-700">Amount</Label>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-semibold text-lg">
-                  â‚¹
+                  \u20B9
                 </span>
                 <Input
                   id="amount"
