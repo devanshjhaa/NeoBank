@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { premiumApi, userApi, transactionApi } from "@/lib/api";
 import type { LedgerEntryResponse, UserProfileResponse } from "@/lib/api";
@@ -21,6 +21,12 @@ import {
   Area,
   AreaChart,
 } from "recharts";
+
+declare global {
+  interface Window {
+    Razorpay: new (options: Record<string, unknown>) => { open: () => void };
+  }
+}
 
 const TYPE_COLORS: Record<string, string> = {
   TOPUP: "#10b981",
@@ -293,7 +299,7 @@ function PremiumAnalytics({ profile, ledger }: { profile: UserProfileResponse; l
                     <BarChart data={monthlySpending} margin={{ top: 4, right: 4, bottom: 0, left: -12 }} barGap={4}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" strokeOpacity={0.5} vertical={false} />
                       <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: "#94a3b8", fontSize: 11 }} dy={8} />
-                      <YAxis axisLine={false} tickLine={false} tick={{ fill: "#94a3b8", fontSize: 11 }} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} dx={-4} />
+                      <YAxis axisLine={false} tickLine={false} tick={{ fill: "#94a3b8", fontSize: 11 }} tickFormatter={(v) => v === 0 ? "\u20B90" : Math.abs(v) >= 100000 ? `\u20B9${(v / 100000).toFixed(v % 100000 === 0 ? 0 : 1)}L` : Math.abs(v) >= 1000 ? `\u20B9${(v / 1000).toFixed(v % 1000 === 0 ? 0 : 1)}k` : `\u20B9${v}`} dx={-4} />
                       <Tooltip
                         contentStyle={{ backgroundColor: "#0f172a", border: "none", borderRadius: "12px", color: "#fff", fontSize: "12px", padding: "10px 14px", boxShadow: "0 10px 40px rgba(0,0,0,0.25)" }}
                         formatter={(value: number | undefined, name?: string) => [`${"\u20B9"}${(value ?? 0).toLocaleString("en-IN")}`, name === "income" ? "Income" : "Spending"]}
@@ -393,7 +399,7 @@ function PremiumAnalytics({ profile, ledger }: { profile: UserProfileResponse; l
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" strokeOpacity={0.5} vertical={false} />
                   <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: "#94a3b8", fontSize: 11 }} dy={8} />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fill: "#94a3b8", fontSize: 11 }} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} dx={-4} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fill: "#94a3b8", fontSize: 11 }} tickFormatter={(v) => v === 0 ? "\u20B90" : Math.abs(v) >= 100000 ? `\u20B9${(v / 100000).toFixed(v % 100000 === 0 ? 0 : 1)}L` : Math.abs(v) >= 1000 ? `\u20B9${(v / 1000).toFixed(v % 1000 === 0 ? 0 : 1)}k` : `\u20B9${v}`} dx={-4} />
                   <Tooltip
                     contentStyle={{ backgroundColor: "#0f172a", border: "none", borderRadius: "12px", color: "#fff", fontSize: "12px", padding: "10px 14px", boxShadow: "0 10px 40px rgba(0,0,0,0.25)" }}
                     formatter={(value: number | undefined) => [`${"\u20B9"}${(value ?? 0).toLocaleString("en-IN")}`, "Net Flow"]}
@@ -441,6 +447,19 @@ export default function PremiumPage() {
   const [profile, setProfile] = useState<UserProfileResponse | null>(null);
   const [ledger, setLedger] = useState<LedgerEntryResponse[]>([]);
   const [loading, setLoading] = useState(true);
+  const [razorpayReady, setRazorpayReady] = useState(false);
+
+  useEffect(() => {
+    if (document.querySelector('script[src*="razorpay"]')) {
+      setRazorpayReady(true);
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    script.onload = () => setRazorpayReady(true);
+    document.body.appendChild(script);
+  }, []);
 
   useEffect(() => {
     Promise.all([userApi.getMe(), transactionApi.getHistory()])
@@ -452,19 +471,44 @@ export default function PremiumPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const handleUpgrade = async () => {
-    setIsUpgrading(true);
-    try {
-      await premiumApi.upgrade();
-      toast.success("Welcome to Premium!", { description: "Your account has been upgraded." });
-      router.push("/dashboard");
-    } catch (error: unknown) {
-      const apiError = error as { message?: string };
-      toast.error("Upgrade failed", { description: apiError.message || "Please try again later." });
-    } finally {
-      setIsUpgrading(false);
+  const handleUpgrade = useCallback(() => {
+    if (!razorpayReady || !window.Razorpay) {
+      toast.error("Payment gateway is still loading. Please wait.");
+      return;
     }
-  };
+    setIsUpgrading(true);
+
+    const options: Record<string, unknown> = {
+      key: "rzp_test_SIu1PYqOQfxM0K",
+      amount: 29900,
+      currency: "INR",
+      name: "NeoBank",
+      description: "Premium Upgrade \u2014 Lifetime Access",
+      handler: async (response: { razorpay_payment_id: string }) => {
+        try {
+          await premiumApi.upgrade();
+          toast.success("Welcome to Premium!", {
+            description: `Payment ${response.razorpay_payment_id} confirmed. Your account has been upgraded.`,
+          });
+          router.push("/dashboard");
+        } catch (error: unknown) {
+          const apiError = error as { message?: string };
+          toast.error("Upgrade failed", {
+            description: apiError.message || "Payment was captured but upgrade failed. Contact support.",
+          });
+        } finally {
+          setIsUpgrading(false);
+        }
+      },
+      modal: {
+        ondismiss: () => setIsUpgrading(false),
+      },
+      theme: { color: "#2563eb" },
+    };
+
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+  }, [razorpayReady, router]);
 
   if (loading) {
     return (

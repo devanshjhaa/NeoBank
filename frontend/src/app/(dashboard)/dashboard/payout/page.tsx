@@ -7,8 +7,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { payoutApi, bankAccountApi } from "@/lib/api";
-import type { BankAccountResponse } from "@/lib/api";
+import { payoutApi, bankAccountApi, walletApi } from "@/lib/api";
+import type { BankAccountResponse, WalletResponse } from "@/lib/api";
 import { formatCurrency } from "@/lib/utils";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
@@ -208,6 +208,7 @@ export default function PayoutPage() {
   const [step, setStep] = useState<"select" | "amount" | "confirm">("select");
   const [payoutAmount, setPayoutAmount] = useState<string>("");
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [wallet, setWallet] = useState<WalletResponse | null>(null);
 
   const {
     register,
@@ -221,11 +222,13 @@ export default function PayoutPage() {
   const amount = watch("amount");
 
   useEffect(() => {
-    bankAccountApi
-      .list()
-      .then((data) => {
+    Promise.all([
+      bankAccountApi.list(),
+      walletApi.getMyWallet(),
+    ]).then(([data, w]) => {
         setAccounts(data);
         if (data.length === 1) setSelectedAccount(data[0]);
+        setWallet(w);
       })
       .catch(() => {})
       .finally(() => setLoadingAccounts(false));
@@ -473,6 +476,21 @@ export default function PayoutPage() {
         <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-0.5">Withdraw funds to your bank account</p>
       </div>
 
+      {wallet && (
+        <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="bg-gradient-to-r from-violet-600 via-violet-700 to-purple-700 rounded-2xl p-5 flex items-center justify-between">
+          <div>
+            <p className="text-[12px] text-violet-200 font-medium">Available for Withdrawal</p>
+            <p className="text-[26px] font-bold text-white tracking-tight mt-0.5">{formatCurrency(wallet.balance)}</p>
+          </div>
+          <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="12" y1="19" x2="12" y2="5" />
+              <polyline points="5 12 12 5 19 12" />
+            </svg>
+          </div>
+        </motion.div>
+      )}
+
       <AnimatePresence mode="wait">
         {showLinkForm ? (
           <LinkBankAccountForm
@@ -604,6 +622,65 @@ export default function PayoutPage() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="bg-white dark:bg-[#111827] rounded-xl border border-slate-200/80 dark:border-slate-700/50 p-5">
+          <div className="flex items-start gap-3.5">
+            <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center shrink-0">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 16 14" />
+              </svg>
+            </div>
+            <div>
+              <h3 className="text-[13px] font-semibold text-slate-900 dark:text-white mb-1">Processing Time</h3>
+              <p className="text-[12px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                Payouts typically take 1-3 business days to arrive at your bank.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white dark:bg-[#111827] rounded-xl border border-slate-200/80 dark:border-slate-700/50 p-5">
+          <div className="flex items-start gap-3.5">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+            </div>
+            <div>
+              <h3 className="text-[13px] font-semibold text-slate-900 dark:text-white mb-1">Verified Accounts Only</h3>
+              <p className="text-[12px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                Withdrawals are only allowed to verified bank accounts for your security.
+              </p>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
+      <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="bg-white dark:bg-[#111827] rounded-xl border border-slate-200/80 dark:border-slate-700/50 p-5">
+        <h3 className="text-[13px] font-semibold text-slate-900 dark:text-white mb-3">Payout Limits</h3>
+        <div className="space-y-2.5">
+          {[
+            { label: "Minimum payout", value: "\u20B9100" },
+            { label: "Per transaction", value: "\u20B925,000", sub: "Free tier" },
+            { label: "Per transaction", value: "\u20B975,000", sub: "Premium", badge: true },
+          ].map((item, i) => (
+            <div key={i} className="flex items-center justify-between py-2 border-b border-slate-100 dark:border-slate-800/80 last:border-0">
+              <div className="flex items-center gap-2">
+                <span className="text-[12px] text-slate-500 dark:text-slate-400">{item.label}</span>
+                {item.badge && (
+                  <span className="px-1.5 py-0.5 rounded-full bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-[10px] font-semibold ring-1 ring-amber-200/50 dark:ring-amber-700/50">
+                    {item.sub}
+                  </span>
+                )}
+                {item.sub && !item.badge && <span className="text-[11px] text-slate-400 dark:text-slate-500">({item.sub})</span>}
+              </div>
+              <span className="text-[13px] font-semibold text-slate-900 dark:text-white">{item.value}</span>
+            </div>
+          ))}
+        </div>
+      </motion.div>
     </div>
   );
 }

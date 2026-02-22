@@ -7,7 +7,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { topupApi } from "@/lib/api";
+import { topupApi, walletApi } from "@/lib/api";
+import type { WalletResponse } from "@/lib/api";
 import { formatCurrency } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -34,6 +35,11 @@ export default function TopupPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [razorpayReady, setRazorpayReady] = useState(false);
+  const [wallet, setWallet] = useState<WalletResponse | null>(null);
+
+  useEffect(() => {
+    walletApi.getMyWallet().then(setWallet).catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (document.querySelector('script[src*="razorpay"]')) {
@@ -119,6 +125,21 @@ export default function TopupPage() {
         <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-0.5">Add funds to your NeoBank wallet</p>
       </div>
 
+      {wallet && (
+        <div className="bg-gradient-to-r from-emerald-600 via-emerald-700 to-teal-700 rounded-2xl p-5 flex items-center justify-between">
+          <div>
+            <p className="text-[12px] text-emerald-200 font-medium">Current Balance</p>
+            <p className="text-[26px] font-bold text-white tracking-tight mt-0.5">{formatCurrency(wallet.balance)}</p>
+          </div>
+          <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+              <line x1="1" y1="10" x2="23" y2="10" />
+            </svg>
+          </div>
+        </div>
+      )}
+
       <div className="bg-white dark:bg-[#111827] rounded-xl border border-slate-200/80 dark:border-slate-700/50 overflow-hidden">
         <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-700/50">
           <h2 className="text-[13px] font-semibold text-slate-900 dark:text-white">Enter Amount</h2>
@@ -184,6 +205,12 @@ export default function TopupPage() {
                   <span className="text-slate-500 dark:text-slate-400">Fee</span>
                   <span className="font-medium text-emerald-600 dark:text-emerald-400">Free</span>
                 </div>
+                {wallet && (
+                  <div className="flex justify-between text-[13px]">
+                    <span className="text-slate-500 dark:text-slate-400">Balance after</span>
+                    <span className="font-medium text-slate-900 dark:text-white">{formatCurrency(wallet.balance + Number(amount))}</span>
+                  </div>
+                )}
                 <div className="border-t border-slate-200 dark:border-slate-700 pt-3 flex justify-between">
                   <span className="text-[13px] font-semibold text-slate-900 dark:text-white">Total</span>
                   <span className="font-bold text-slate-900 dark:text-white text-lg tracking-tight">

@@ -494,7 +494,7 @@ export default function DashboardPage() {
                       axisLine={false}
                       tickLine={false}
                       tick={{ fill: "#94a3b8", fontSize: 11 }}
-                      tickFormatter={(v) => `${"\u20B9"}${(v / 1000).toFixed(0)}k`}
+                      tickFormatter={(v) => v === 0 ? "\u20B90" : Math.abs(v) >= 100000 ? `\u20B9${(v / 100000).toFixed(v % 100000 === 0 ? 0 : 1)}L` : Math.abs(v) >= 1000 ? `\u20B9${(v / 1000).toFixed(v % 1000 === 0 ? 0 : 1)}k` : `\u20B9${v}`}
                       dx={-4}
                     />
                     <Tooltip
@@ -591,7 +591,7 @@ export default function DashboardPage() {
                         axisLine={false}
                         tickLine={false}
                         tick={{ fill: "#94a3b8", fontSize: 11 }}
-                        tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`}
+                        tickFormatter={(v) => v === 0 ? "\u20B90" : Math.abs(v) >= 100000 ? `\u20B9${(v / 100000).toFixed(v % 100000 === 0 ? 0 : 1)}L` : Math.abs(v) >= 1000 ? `\u20B9${(v / 1000).toFixed(v % 1000 === 0 ? 0 : 1)}k` : `\u20B9${v}`}
                         dx={-4}
                       />
                       <Tooltip
