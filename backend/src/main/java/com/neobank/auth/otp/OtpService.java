@@ -20,7 +20,7 @@ public class OtpService {
 
     private static final Duration OTP_TTL = Duration.ofMinutes(5);
     private static final int MAX_ATTEMPTS = 5;
-    private static final String FROM_EMAIL = "onboarding@resend.dev";
+    private static final String FROM_EMAIL = "neobank@ticksmanage.email";
     private static final String FROM_NAME = "NeoBank";
 
     private final StringRedisTemplate redis;
