@@ -44,7 +44,7 @@ export default function SignupPage() {
       if (response.newUser) {
         localStorage.setItem("accessToken", response.accessToken);
         const payload = JSON.parse(atob(response.accessToken.split(".")[1]));
-        localStorage.setItem("pendingEmail", payload.sub || payload.email || "");
+        localStorage.setItem("pendingEmail", payload.email || "");
         toast.success("Account created!", {
           description: "Verify your phone number to activate your wallet.",
         });

@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import { walletApi, transactionApi, userApi } from "@/lib/api";
 import type { LedgerEntryResponse, UserProfileResponse } from "@/lib/api";
 import { formatCurrency, formatDate } from "@/lib/utils";
+import { toast } from "sonner";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -253,6 +254,22 @@ export default function DashboardPage() {
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight mt-0.5">
             {greeting}, {profile?.email?.split("@")[0] || "there"}
           </h1>
+          {profile?.id && (
+            <button
+              type="button"
+              onClick={() => {
+                navigator.clipboard.writeText(String(profile.id));
+                toast.success("User ID copied!", { description: `Share #${profile.id} with others to receive transfers.` });
+              }}
+              className="mt-1.5 inline-flex items-center gap-1.5 text-[11px] font-medium text-slate-400 dark:text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors group cursor-pointer"
+            >
+              <span className="tabular-nums">Your ID: #{profile.id}</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-0 group-hover:opacity-100 transition-opacity">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+              </svg>
+            </button>
+          )}
         </div>
         <div className="flex items-center gap-2">
           <Link
