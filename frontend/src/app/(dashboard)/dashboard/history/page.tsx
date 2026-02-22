@@ -16,7 +16,7 @@ const filters: { label: string; value: FilterType }[] = [
 
 const iconConfig: Record<string, { bg: string; stroke: string; path: React.ReactNode }> = {
   TOPUP: {
-    bg: "bg-emerald-50",
+    bg: "bg-emerald-50 dark:bg-emerald-900/30",
     stroke: "#059669",
     path: (
       <>
@@ -26,7 +26,7 @@ const iconConfig: Record<string, { bg: string; stroke: string; path: React.React
     ),
   },
   P2P: {
-    bg: "bg-blue-50",
+    bg: "bg-blue-50 dark:bg-blue-900/30",
     stroke: "#2563eb",
     path: (
       <>
@@ -36,7 +36,7 @@ const iconConfig: Record<string, { bg: string; stroke: string; path: React.React
     ),
   },
   WITHDRAW: {
-    bg: "bg-violet-50",
+    bg: "bg-violet-50 dark:bg-violet-900/30",
     stroke: "#7c3aed",
     path: (
       <>
@@ -46,7 +46,7 @@ const iconConfig: Record<string, { bg: string; stroke: string; path: React.React
     ),
   },
   REVERSAL: {
-    bg: "bg-amber-50",
+    bg: "bg-amber-50 dark:bg-amber-900/30",
     stroke: "#d97706",
     path: (
       <>
@@ -91,13 +91,13 @@ export default function HistoryPage() {
   if (isLoading) {
     return (
       <div className="space-y-6 animate-pulse">
-        <div className="h-8 w-64 bg-slate-200 rounded-lg" />
+        <div className="h-8 w-64 bg-slate-200 dark:bg-slate-700 rounded-lg" />
         <div className="flex gap-2">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-10 w-24 bg-slate-200 rounded-xl" />
+            <div key={i} className="h-10 w-24 bg-slate-200 dark:bg-slate-700 rounded-xl" />
           ))}
         </div>
-        <div className="bg-white rounded-xl border border-slate-100 h-[400px]" />
+        <div className="bg-white dark:bg-[#111827] rounded-xl border border-slate-100 dark:border-slate-700/50 h-[400px]" />
       </div>
     );
   }
@@ -105,8 +105,8 @@ export default function HistoryPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-[22px] font-bold text-slate-900 tracking-tight">Transaction History</h1>
-        <p className="text-[13px] text-slate-500 mt-0.5">View all your past transactions</p>
+        <h1 className="text-[22px] font-bold text-slate-900 dark:text-white tracking-tight">Transaction History</h1>
+        <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-0.5">View all your past transactions</p>
       </div>
 
       <div className="flex flex-wrap gap-2">
@@ -117,7 +117,7 @@ export default function HistoryPage() {
             className={`px-4 py-2 rounded-xl text-[13px] font-semibold transition-all ${
               filter === f.value
                 ? "bg-blue-600 text-white shadow-sm shadow-blue-600/20"
-                : "bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-50 hover:border-slate-300"
+                : "bg-white dark:bg-[#111827] text-slate-600 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700/50 hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:border-slate-300 dark:hover:border-slate-600"
             }`}
           >
             {f.label}
@@ -125,41 +125,41 @@ export default function HistoryPage() {
         ))}
       </div>
 
-      <div className="bg-white rounded-xl border border-slate-200/80 overflow-hidden">
-        <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+      <div className="bg-white dark:bg-[#111827] rounded-xl border border-slate-200/80 dark:border-slate-700/50 overflow-hidden">
+        <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-700/50 flex items-center justify-between">
           <div>
-            <h2 className="text-[13px] font-semibold text-slate-900">
+            <h2 className="text-[13px] font-semibold text-slate-900 dark:text-white">
               {filter === "ALL" ? "All Transactions" : `${filters.find(f => f.value === filter)?.label} Transactions`}
             </h2>
-            <p className="text-[11px] text-slate-400 mt-0.5">{filtered.length} transaction{filtered.length !== 1 ? "s" : ""}</p>
+            <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">{filtered.length} transaction{filtered.length !== 1 ? "s" : ""}</p>
           </div>
         </div>
 
         {filtered.length === 0 ? (
           <div className="text-center py-16">
-            <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-slate-100 flex items-center justify-center">
+            <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="10" />
                 <line x1="12" y1="8" x2="12" y2="12" />
                 <line x1="12" y1="16" x2="12.01" y2="16" />
               </svg>
             </div>
-            <h3 className="text-[15px] font-semibold text-slate-900 mb-1">No transactions found</h3>
-            <p className="text-[13px] text-slate-400">
+            <h3 className="text-[15px] font-semibold text-slate-900 dark:text-white mb-1">No transactions found</h3>
+            <p className="text-[13px] text-slate-400 dark:text-slate-500">
               {filter === "ALL"
                 ? "You haven\u2019t made any transactions yet"
                 : `No ${filters.find(f => f.value === filter)?.label?.toLowerCase()} transactions found`}
             </p>
           </div>
         ) : (
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-slate-100 dark:divide-slate-700/50">
             {filtered.map((entry) => {
               const cfg = iconConfig[entry.txnType] || iconConfig["P2P"];
               const isCredit = entry.direction === "CREDIT";
               return (
                 <div
                   key={entry.id}
-                  className="flex items-center justify-between px-5 py-4 hover:bg-slate-50/60 transition-colors"
+                  className="flex items-center justify-between px-5 py-4 hover:bg-slate-50/60 dark:hover:bg-slate-700/30 transition-colors"
                 >
                   <div className="flex items-center gap-3.5">
                     <div className={`w-10 h-10 rounded-xl ${cfg.bg} flex items-center justify-center`}>
@@ -168,16 +168,16 @@ export default function HistoryPage() {
                       </svg>
                     </div>
                     <div>
-                      <p className="text-[13px] font-semibold text-slate-900">
+                      <p className="text-[13px] font-semibold text-slate-900 dark:text-white">
                         {entry.description || txnLabel(entry.txnType, entry.direction)}
                       </p>
-                      <p className="text-[12px] text-slate-400 mt-0.5">
+                      <p className="text-[12px] text-slate-400 dark:text-slate-500 mt-0.5">
                         {entry.txnType} &middot; {formatDate(entry.createdAt)}
                       </p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className={`text-[14px] font-bold tabular-nums ${isCredit ? "text-emerald-600" : "text-slate-900"}`}>
+                    <p className={`text-[14px] font-bold tabular-nums ${isCredit ? "text-emerald-600 dark:text-emerald-400" : "text-slate-900 dark:text-white"}`}>
                       {isCredit ? "+" : "-"}{formatCurrency(entry.amount, "INR")}
                     </p>
                   </div>

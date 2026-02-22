@@ -1,6 +1,8 @@
 @import "tailwindcss";
 @import "locomotive-scroll/dist/locomotive-scroll.css";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* ============================================
    NeoBank Design System
    ============================================ */
@@ -45,6 +47,24 @@
   --radius-xl: 0.75rem;
 }
 
+/* Dark mode overrides */
+.dark {
+  --color-background: #0b0f1a;
+  --color-foreground: #e2e8f0;
+  --color-card: #111827;
+  --color-card-foreground: #e2e8f0;
+  --color-muted: #1e293b;
+  --color-muted-foreground: #94a3b8;
+  --color-border: #1e293b;
+  --color-input: #1e293b;
+  --color-secondary: #1e293b;
+  --color-secondary-foreground: #e2e8f0;
+  --color-accent: #1e293b;
+  --color-accent-foreground: #e2e8f0;
+  --color-popover: #111827;
+  --color-popover-foreground: #e2e8f0;
+}
+
 /* ============================================
    Base Styles
    ============================================ */
@@ -77,6 +97,16 @@ select:-webkit-autofill:focus {
   -webkit-text-fill-color: #0f172a;
   -webkit-box-shadow: 0 0 0px 1000px #ffffff inset;
   transition: background-color 5000s ease-in-out 0s, border-color 0.3s ease-in-out;
+}
+
+.dark input:-webkit-autofill,
+.dark input:-webkit-autofill:hover,
+.dark input:-webkit-autofill:focus,
+.dark textarea:-webkit-autofill,
+.dark textarea:-webkit-autofill:hover,
+.dark textarea:-webkit-autofill:focus {
+  -webkit-text-fill-color: #e2e8f0;
+  -webkit-box-shadow: 0 0 0px 1000px #1e293b inset;
 }
 
 /* ============================================

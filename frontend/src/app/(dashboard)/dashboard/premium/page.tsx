@@ -96,13 +96,13 @@ export default function PremiumPage() {
   if (alreadyPremium) {
     return (
       <div className="max-w-md mx-auto text-center py-16 space-y-4">
-        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center mx-auto shadow-lg shadow-amber-200/50">
+        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center mx-auto shadow-lg shadow-amber-200/50 dark:shadow-amber-900/50">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
           </svg>
         </div>
-        <h1 className="text-[22px] font-bold text-slate-900 tracking-tight">You&apos;re Already Premium</h1>
-        <p className="text-[14px] text-slate-500">
+        <h1 className="text-[22px] font-bold text-slate-900 dark:text-white tracking-tight">You&apos;re Already Premium</h1>
+        <p className="text-[14px] text-slate-500 dark:text-slate-400">
           You have lifetime premium access with all exclusive features unlocked.
         </p>
         <button
@@ -118,19 +118,19 @@ export default function PremiumPage() {
   return (
     <div className="space-y-8 max-w-3xl mx-auto">
       <div className="text-center">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-amber-50 to-orange-50 ring-1 ring-amber-200/50 text-amber-700 text-[12px] font-semibold mb-4">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/30 dark:to-orange-900/30 ring-1 ring-amber-200/50 dark:ring-amber-700/50 text-amber-700 dark:text-amber-400 text-[12px] font-semibold mb-4">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
           </svg>
           Premium
         </div>
-        <h1 className="text-[26px] font-bold text-slate-900 tracking-tight">Upgrade to Premium</h1>
-        <p className="text-[14px] text-slate-500 mt-1.5 max-w-md mx-auto">
+        <h1 className="text-[26px] font-bold text-slate-900 dark:text-white tracking-tight">Upgrade to Premium</h1>
+        <p className="text-[14px] text-slate-500 dark:text-slate-400 mt-1.5 max-w-md mx-auto">
           Unlock exclusive features and enjoy zero fees on all transactions
         </p>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-sm shadow-slate-200/40 max-w-md mx-auto">
+      <div className="bg-white dark:bg-[#111827] rounded-2xl border border-slate-200/80 dark:border-slate-700/50 overflow-hidden shadow-sm shadow-slate-200/40 dark:shadow-black/20 max-w-md mx-auto">
         <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-700 p-8 text-center">
           <div className="flex items-baseline justify-center gap-1.5">
             <span className="text-5xl font-bold text-white tracking-tight">{"\u20B9"}299</span>
@@ -143,12 +143,12 @@ export default function PremiumPage() {
           <ul className="space-y-3">
             {features.map((feature, index) => (
               <li key={index} className="flex items-center gap-3">
-                <div className="w-5 h-5 rounded-full bg-emerald-50 flex items-center justify-center shrink-0">
+                <div className="w-5 h-5 rounded-full bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
                 </div>
-                <span className="text-[13px] text-slate-600">{feature}</span>
+                <span className="text-[13px] text-slate-600 dark:text-slate-300">{feature}</span>
               </li>
             ))}
           </ul>
@@ -170,14 +170,14 @@ export default function PremiumPage() {
       </div>
 
       <div>
-        <h2 className="text-[15px] font-semibold text-slate-900 mb-4 text-center tracking-tight">
+        <h2 className="text-[15px] font-semibold text-slate-900 dark:text-white mb-4 text-center tracking-tight">
           What You&apos;ll Get
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {benefits.map((benefit, index) => (
             <div
               key={index}
-              className="group bg-white rounded-xl border border-slate-200/80 p-5 flex items-start gap-4 hover:shadow-md hover:shadow-slate-200/60 transition-all"
+              className="group bg-white dark:bg-[#111827] rounded-xl border border-slate-200/80 dark:border-slate-700/50 p-5 flex items-start gap-4 hover:shadow-md hover:shadow-slate-200/60 dark:hover:shadow-black/20 transition-all"
             >
               <div className={`w-11 h-11 rounded-xl ${benefit.bg} flex items-center justify-center shrink-0 ${benefit.color} group-hover:scale-110 transition-transform`}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -185,8 +185,8 @@ export default function PremiumPage() {
                 </svg>
               </div>
               <div>
-                <h3 className="text-[13px] font-semibold text-slate-900">{benefit.title}</h3>
-                <p className="text-[12px] text-slate-500 mt-0.5 leading-relaxed">{benefit.description}</p>
+                <h3 className="text-[13px] font-semibold text-slate-900 dark:text-white">{benefit.title}</h3>
+                <p className="text-[12px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">{benefit.description}</p>
               </div>
             </div>
           ))}

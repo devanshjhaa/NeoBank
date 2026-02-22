@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Gabarito } from "next/font/google";
 import { Toaster } from "sonner";
+import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
 const inter = Inter({
@@ -47,10 +48,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${gabarito.variable}`}>
-      <body className="min-h-screen bg-white text-slate-900 antialiased">
-        <main>{children}</main>
-        <Toaster position="top-right" richColors />
+    <html lang="en" className={`${inter.variable} ${gabarito.variable}`} suppressHydrationWarning>
+      <body className="min-h-screen bg-white dark:bg-[#0b0f1a] text-slate-900 dark:text-slate-100 antialiased transition-colors duration-300">
+        <ThemeProvider>
+          <main>{children}</main>
+          <Toaster position="top-right" richColors />
+        </ThemeProvider>
       </body>
     </html>
   );

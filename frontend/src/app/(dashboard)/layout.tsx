@@ -160,7 +160,7 @@ export default function DashboardLayout({
 
   if (!ready) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#f8f9fb]">
+      <div className="min-h-screen flex items-center justify-center bg-[#f8f9fb] dark:bg-[#0b0f1a]">
         <div className="flex flex-col items-center gap-4">
           <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center animate-pulse">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
@@ -179,7 +179,7 @@ export default function DashboardLayout({
     href === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(href);
 
   return (
-    <div className="min-h-screen bg-[#f8f9fb]">
+    <div className="min-h-screen bg-[#f8f9fb] dark:bg-[#0b0f1a] transition-colors duration-300">
       {sidebarOpen && (
         <div
           className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 lg:hidden transition-opacity"
@@ -189,20 +189,20 @@ export default function DashboardLayout({
 
       <aside
         className={cn(
-          "fixed top-0 left-0 z-50 h-full w-[252px] bg-white border-r border-slate-200/80 transition-transform duration-300 lg:translate-x-0 flex flex-col",
+          "fixed top-0 left-0 z-50 h-full w-[252px] bg-white dark:bg-[#111827] border-r border-slate-200/80 dark:border-slate-700/50 transition-all duration-300 lg:translate-x-0 flex flex-col",
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
         <div className="h-[60px] flex items-center px-5 shrink-0">
           <Link href="/dashboard" className="flex items-center gap-2.5">
             <LogoIcon size={32} />
-            <span className="text-[16px] font-bold text-slate-900 tracking-tight">
+            <span className="text-[16px] font-bold text-slate-900 dark:text-white tracking-tight">
               NeoBank
             </span>
           </Link>
           <button
             onClick={() => setSidebarOpen(false)}
-            className="lg:hidden ml-auto p-1.5 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+            className="lg:hidden ml-auto p-1.5 rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <line x1="18" y1="6" x2="6" y2="18" />
@@ -212,7 +212,7 @@ export default function DashboardLayout({
         </div>
 
         <nav className="flex-1 px-3 py-2 overflow-y-auto">
-          <p className="px-3 pt-3 pb-2 text-[10.5px] font-semibold text-slate-400 uppercase tracking-[0.08em]">
+          <p className="px-3 pt-3 pb-2 text-[10.5px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-[0.08em]">
             Main
           </p>
           <div className="space-y-0.5">
@@ -227,10 +227,10 @@ export default function DashboardLayout({
                     "flex items-center gap-3 px-3 py-[9px] rounded-lg text-[13px] font-medium transition-all duration-150 group",
                     active
                       ? "bg-blue-600 text-white shadow-sm shadow-blue-600/20"
-                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-700/50"
                   )}
                 >
-                  <span className={cn("shrink-0 transition-colors", active ? "text-white" : "text-slate-400 group-hover:text-slate-500")}>
+                  <span className={cn("shrink-0 transition-colors", active ? "text-white" : "text-slate-400 dark:text-slate-500 group-hover:text-slate-500 dark:group-hover:text-slate-300")}>
                     {item.icon}
                   </span>
                   {item.label}
@@ -241,9 +241,9 @@ export default function DashboardLayout({
 
           {userTier === "ADMIN" && (
             <>
-              <div className="my-4 mx-3 border-t border-slate-100" />
+              <div className="my-4 mx-3 border-t border-slate-100 dark:border-slate-700/50" />
 
-              <p className="px-3 pt-1 pb-2 text-[10.5px] font-semibold text-slate-400 uppercase tracking-[0.08em]">
+              <p className="px-3 pt-1 pb-2 text-[10.5px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-[0.08em]">
                 Admin
               </p>
               <div className="space-y-0.5">
@@ -258,10 +258,10 @@ export default function DashboardLayout({
                         "flex items-center gap-3 px-3 py-[9px] rounded-lg text-[13px] font-medium transition-all duration-150 group",
                         active
                           ? "bg-blue-600 text-white shadow-sm shadow-blue-600/20"
-                          : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                          : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-700/50"
                       )}
                     >
-                      <span className={cn("shrink-0 transition-colors", active ? "text-white" : "text-slate-400 group-hover:text-slate-500")}>
+                      <span className={cn("shrink-0 transition-colors", active ? "text-white" : "text-slate-400 dark:text-slate-500 group-hover:text-slate-500 dark:group-hover:text-slate-300")}>
                         {item.icon}
                       </span>
                       {item.label}
@@ -272,9 +272,9 @@ export default function DashboardLayout({
             </>
           )}
 
-          <div className="my-4 mx-3 border-t border-slate-100" />
+          <div className="my-4 mx-3 border-t border-slate-100 dark:border-slate-700/50" />
 
-          <p className="px-3 pt-1 pb-2 text-[10.5px] font-semibold text-slate-400 uppercase tracking-[0.08em]">
+          <p className="px-3 pt-1 pb-2 text-[10.5px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-[0.08em]">
             Account
           </p>
           <div className="space-y-0.5">
@@ -289,17 +289,17 @@ export default function DashboardLayout({
                     "flex items-center gap-3 px-3 py-[9px] rounded-lg text-[13px] font-medium transition-all duration-150 group",
                     active
                       ? "bg-blue-600 text-white shadow-sm shadow-blue-600/20"
-                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-700/50"
                   )}
                 >
-                  <span className={cn("shrink-0 transition-colors", active ? "text-white" : "text-slate-400 group-hover:text-slate-500")}>
+                  <span className={cn("shrink-0 transition-colors", active ? "text-white" : "text-slate-400 dark:text-slate-500 group-hover:text-slate-500 dark:group-hover:text-slate-300")}>
                     {item.icon}
                   </span>
                   {item.label}
                   {"badge" in item && item.badge && (
                     <span className={cn(
                       "ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded",
-                      active ? "bg-white/20 text-white" : "bg-amber-100 text-amber-700"
+                      active ? "bg-white/20 text-white" : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
                     )}>
                       {item.badge}
                     </span>
@@ -310,9 +310,9 @@ export default function DashboardLayout({
 
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-3 px-3 py-[9px] rounded-lg text-[13px] font-medium text-slate-600 hover:text-red-600 hover:bg-red-50 transition-all duration-150 group"
+              className="w-full flex items-center gap-3 px-3 py-[9px] rounded-lg text-[13px] font-medium text-slate-600 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-150 group"
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400 group-hover:text-red-500 transition-colors shrink-0">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400 dark:text-slate-500 group-hover:text-red-500 dark:group-hover:text-red-400 transition-colors shrink-0">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
                 <polyline points="16 17 21 12 16 7" />
                 <line x1="21" y1="12" x2="9" y2="12" />
@@ -322,18 +322,18 @@ export default function DashboardLayout({
           </div>
         </nav>
 
-        <div className="p-3 border-t border-slate-100 shrink-0">
-          <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 transition-colors cursor-default">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-[13px] font-bold text-white shrink-0 ring-2 ring-white shadow-sm">
+        <div className="p-3 border-t border-slate-100 dark:border-slate-700/50 shrink-0">
+          <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors cursor-default">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-[13px] font-bold text-white shrink-0 ring-2 ring-white dark:ring-slate-800 shadow-sm">
               {initials}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[13px] font-semibold text-slate-900 truncate">
+              <p className="text-[13px] font-semibold text-slate-900 dark:text-white truncate">
                 {userEmail || "User"}
               </p>
-              <p className="text-[11px] text-slate-400">{userTier === "PREMIUM" || userTier === "ADMIN" ? "Premium" : "Free plan"}</p>
+              <p className="text-[11px] text-slate-400 dark:text-slate-500">{userTier === "PREMIUM" || userTier === "ADMIN" ? "Premium" : "Free plan"}</p>
             </div>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-slate-300 shrink-0">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-slate-300 dark:text-slate-600 shrink-0">
               <polyline points="6 9 12 15 18 9" />
             </svg>
           </div>
@@ -341,11 +341,11 @@ export default function DashboardLayout({
       </aside>
 
       <div className="lg:pl-[252px]">
-        <header className="sticky top-0 z-30 h-[60px] bg-white/80 backdrop-blur-lg border-b border-slate-200/80">
+        <header className="sticky top-0 z-30 h-[60px] bg-white/80 dark:bg-[#111827]/80 backdrop-blur-lg border-b border-slate-200/80 dark:border-slate-700/50 transition-colors duration-300">
           <div className="h-full px-4 lg:px-6 flex items-center gap-4">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="lg:hidden p-2 -ml-2 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+              className="lg:hidden p-2 -ml-2 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="4" y1="7" x2="20" y2="7" />
@@ -363,9 +363,9 @@ export default function DashboardLayout({
                 <input
                   type="text"
                   placeholder="Search transactions, users..."
-                  className="w-full pl-9 pr-3 py-2 rounded-lg bg-slate-50 border border-transparent text-[13px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:bg-white focus:border-blue-200 focus:ring-2 focus:ring-blue-600/10 transition-all"
+                  className="w-full pl-9 pr-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-transparent text-[13px] text-slate-900 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:bg-white dark:focus:bg-slate-700 focus:border-blue-200 dark:focus:border-blue-700 focus:ring-2 focus:ring-blue-600/10 transition-all"
                 />
-                <kbd className="hidden lg:inline-flex absolute right-3 top-1/2 -translate-y-1/2 px-1.5 py-0.5 font-mono text-[10px] text-slate-400 bg-white border border-slate-200 rounded">
+                <kbd className="hidden lg:inline-flex absolute right-3 top-1/2 -translate-y-1/2 px-1.5 py-0.5 font-mono text-[10px] text-slate-400 dark:text-slate-500 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded">
                   /
                 </kbd>
               </div>
@@ -374,7 +374,7 @@ export default function DashboardLayout({
             <div className="flex-1 md:hidden" />
 
             <div className="flex items-center gap-1">
-              <button className="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-colors">
+              <button className="p-2 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="10" />
                   <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
@@ -382,7 +382,7 @@ export default function DashboardLayout({
                 </svg>
               </button>
 
-              <button className="relative p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-colors">
+              <button className="relative p-2 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
                   <path d="M13.73 21a2 2 0 0 1-3.46 0" />
@@ -390,7 +390,7 @@ export default function DashboardLayout({
                 <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white" />
               </button>
 
-              <div className="hidden md:block w-px h-6 bg-slate-200 mx-2" />
+              <div className="hidden md:block w-px h-6 bg-slate-200 dark:bg-slate-700 mx-2" />
 
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-xs font-bold text-white ring-2 ring-white shadow-sm cursor-pointer lg:hidden">
                 {initials}

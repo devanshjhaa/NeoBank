@@ -203,10 +203,10 @@ export default function DashboardPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <div>
-          <p className="text-[13px] font-medium text-slate-400 mb-0.5">
+          <p className="text-[13px] font-medium text-slate-400 dark:text-slate-500 mb-0.5">
             {new Date().toLocaleDateString("en-IN", { weekday: "long", month: "long", day: "numeric" })}
           </p>
-          <h1 className="text-[22px] font-bold text-slate-900 tracking-tight">
+          <h1 className="text-[22px] font-bold text-slate-900 dark:text-white tracking-tight">
             Good {new Date().getHours() < 12 ? "morning" : new Date().getHours() < 17 ? "afternoon" : "evening"} {"👋"}
           </h1>
         </div>
@@ -266,17 +266,17 @@ export default function DashboardPage() {
         ].map((stat) => (
           <div
             key={stat.label}
-            className="bg-white rounded-xl border border-slate-200/80 p-5 hover:shadow-md hover:shadow-slate-200/60 transition-all duration-200 group"
+            className="bg-white dark:bg-[#111827] rounded-xl border border-slate-200/80 dark:border-slate-700/50 p-5 hover:shadow-md hover:shadow-slate-200/60 dark:hover:shadow-black/20 transition-all duration-200 group"
           >
             <div className="flex items-center justify-between mb-3">
-              <p className="text-[13px] font-medium text-slate-500">{stat.label}</p>
+              <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400">{stat.label}</p>
               <div className={`w-9 h-9 rounded-lg ${stat.iconBg} flex items-center justify-center transition-transform duration-200 group-hover:scale-110`}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={stat.iconStroke} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   {stat.icon}
                 </svg>
               </div>
             </div>
-            <p className="text-[22px] font-bold text-slate-900 tracking-tight">
+            <p className="text-[22px] font-bold text-slate-900 dark:text-white tracking-tight">
               {stat.value}
             </p>
           </div>
@@ -284,10 +284,10 @@ export default function DashboardPage() {
       </div>
 
       {chartData.length > 1 && (
-        <div className="bg-white rounded-xl border border-slate-200/80 overflow-hidden">
-          <div className="px-5 py-4 border-b border-slate-100">
-            <h2 className="text-[13px] font-semibold text-slate-900">Balance Over Time</h2>
-            <p className="text-[11px] text-slate-400 mt-0.5">Based on your transaction history</p>
+        <div className="bg-white dark:bg-[#111827] rounded-xl border border-slate-200/80 dark:border-slate-700/50 overflow-hidden">
+          <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-700/50">
+            <h2 className="text-[13px] font-semibold text-slate-900 dark:text-white">Balance Over Time</h2>
+            <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">Based on your transaction history</p>
           </div>
           <div className="p-5 lg:p-6">
             <div className="h-[280px]">
@@ -347,20 +347,20 @@ export default function DashboardPage() {
       )}
 
       <div className="grid lg:grid-cols-3 gap-5">
-        <div className="bg-white rounded-xl border border-slate-200/80 p-5">
-          <h2 className="text-[13px] font-semibold text-slate-900 mb-4">Quick Actions</h2>
+        <div className="bg-white dark:bg-[#111827] rounded-xl border border-slate-200/80 dark:border-slate-700/50 p-5">
+          <h2 className="text-[13px] font-semibold text-slate-900 dark:text-white mb-4">Quick Actions</h2>
           <div className="space-y-1.5">
             {quickActions.map((action) => (
               <Link key={action.href} href={action.href}>
-                <div className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-all duration-150 cursor-pointer group">
+                <div className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-all duration-150 cursor-pointer group">
                   <div className={`w-10 h-10 rounded-xl ${action.bg} flex items-center justify-center shrink-0 transition-colors`}>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={action.stroke} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       {action.icon}
                     </svg>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-semibold text-slate-900">{action.label}</p>
-                    <p className="text-[11px] text-slate-400">{action.desc}</p>
+                    <p className="text-[13px] font-semibold text-slate-900 dark:text-white">{action.label}</p>
+                    <p className="text-[11px] text-slate-400 dark:text-slate-500">{action.desc}</p>
                   </div>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-slate-300 group-hover:text-slate-400 group-hover:translate-x-0.5 transition-all shrink-0">
                     <polyline points="9 18 15 12 9 6" />
@@ -371,9 +371,9 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200/80 p-5">
+        <div className="lg:col-span-2 bg-white dark:bg-[#111827] rounded-xl border border-slate-200/80 dark:border-slate-700/50 p-5">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-[13px] font-semibold text-slate-900">Recent Transactions</h2>
+            <h2 className="text-[13px] font-semibold text-slate-900 dark:text-white">Recent Transactions</h2>
             <Link
               href="/dashboard/history"
               className="text-[12px] font-semibold text-blue-600 hover:text-blue-700 transition-colors"
@@ -391,8 +391,8 @@ export default function DashboardPage() {
                   <line x1="12" y1="16" x2="12.01" y2="16" />
                 </svg>
               </div>
-              <p className="text-[13px] font-semibold text-slate-900 mb-1">No transactions yet</p>
-              <p className="text-[12px] text-slate-400">Top up your wallet to get started</p>
+              <p className="text-[13px] font-semibold text-slate-900 dark:text-white mb-1">No transactions yet</p>
+              <p className="text-[12px] text-slate-400 dark:text-slate-500">Top up your wallet to get started</p>
             </div>
           ) : (
             <div className="space-y-0.5">
@@ -402,7 +402,7 @@ export default function DashboardPage() {
                 return (
                   <div
                     key={entry.id}
-                    className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 transition-colors"
+                    className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
                   >
                     <div className="flex items-center gap-3">
                       <div className={`w-10 h-10 rounded-xl ${icon.bg} flex items-center justify-center shrink-0`}>
@@ -411,10 +411,10 @@ export default function DashboardPage() {
                         </svg>
                       </div>
                       <div>
-                        <p className="text-[13px] font-semibold text-slate-900">
+                        <p className="text-[13px] font-semibold text-slate-900 dark:text-white">
                           {entry.description || txnLabel(entry.txnType, entry.direction)}
                         </p>
-                        <p className="text-[11px] text-slate-400">{formatDate(entry.createdAt)}</p>
+                        <p className="text-[11px] text-slate-400 dark:text-slate-500">{formatDate(entry.createdAt)}</p>
                       </div>
                     </div>
                     <p className={`text-[13px] font-bold tabular-nums ${isCredit ? "text-emerald-600" : "text-slate-900"}`}>

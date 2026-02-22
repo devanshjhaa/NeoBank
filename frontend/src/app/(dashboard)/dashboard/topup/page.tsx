@@ -115,14 +115,14 @@ export default function TopupPage() {
   return (
     <div className="space-y-6 max-w-2xl">
       <div>
-        <h1 className="text-[22px] font-bold text-slate-900 tracking-tight">Top Up Wallet</h1>
-        <p className="text-[13px] text-slate-500 mt-0.5">Add funds to your NeoBank wallet</p>
+        <h1 className="text-[22px] font-bold text-slate-900 dark:text-white tracking-tight">Top Up Wallet</h1>
+        <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-0.5">Add funds to your NeoBank wallet</p>
       </div>
 
-      <div className="bg-white rounded-xl border border-slate-200/80 overflow-hidden">
-        <div className="px-5 py-4 border-b border-slate-100">
-          <h2 className="text-[13px] font-semibold text-slate-900">Enter Amount</h2>
-          <p className="text-[11px] text-slate-400 mt-0.5">Choose a preset amount or enter a custom value</p>
+      <div className="bg-white dark:bg-[#111827] rounded-xl border border-slate-200/80 dark:border-slate-700/50 overflow-hidden">
+        <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-700/50">
+          <h2 className="text-[13px] font-semibold text-slate-900 dark:text-white">Enter Amount</h2>
+          <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">Choose a preset amount or enter a custom value</p>
         </div>
 
         <div className="p-5">
@@ -136,19 +136,19 @@ export default function TopupPage() {
                   className={`py-3 px-2 rounded-xl text-[13px] font-semibold transition-all duration-150 ${
                     selectedAmount === amt || amount === amt.toString()
                       ? "bg-blue-600 text-white shadow-sm shadow-blue-600/20 ring-1 ring-blue-600"
-                      : "bg-slate-50 text-slate-600 hover:bg-slate-100 ring-1 ring-slate-200"
+                    : "bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 ring-1 ring-slate-200 dark:ring-slate-600"
                   }`}
                 >
-                  \u20B9{amt.toLocaleString("en-IN")}
+                  {"\u20B9"}{amt.toLocaleString("en-IN")}
                 </button>
               ))}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="amount" className="text-[13px] font-medium text-slate-700">Custom Amount</Label>
+              <Label htmlFor="amount" className="text-[13px] font-medium text-slate-700 dark:text-slate-300">Custom Amount</Label>
               <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-semibold text-lg">
-                  \u20B9
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 font-semibold text-lg">
+                  {"\u20B9"}
                 </span>
                 <Input
                   id="amount"
@@ -157,7 +157,7 @@ export default function TopupPage() {
                   min="10"
                   max="100000"
                   placeholder="0"
-                  className="pl-9 text-2xl h-14 font-bold rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500/20"
+                  className="pl-9 text-2xl h-14 font-bold rounded-xl border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-white focus:border-blue-500 focus:ring-blue-500/20"
                   disabled={isLoading}
                   {...register("amount")}
                   onChange={(e) => {
@@ -169,24 +169,24 @@ export default function TopupPage() {
               {errors.amount && (
                 <p className="text-[12px] text-red-600 font-medium">{errors.amount.message}</p>
               )}
-              <p className="text-[11px] text-slate-400">
-                Min: \u20B910 &bull; Max: \u20B91,00,000
+              <p className="text-[11px] text-slate-400 dark:text-slate-500">
+                Min: {"\u20B9"}10 &bull; Max: {"\u20B9"}1,00,000
               </p>
             </div>
 
             {amount && Number(amount) > 0 && (
-              <div className="p-4 rounded-xl bg-slate-50 ring-1 ring-slate-100 space-y-3">
+              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 ring-1 ring-slate-100 dark:ring-slate-700/50 space-y-3">
                 <div className="flex justify-between text-[13px]">
-                  <span className="text-slate-500">Amount</span>
-                  <span className="font-medium text-slate-900">{formatCurrency(Number(amount))}</span>
+                  <span className="text-slate-500 dark:text-slate-400">Amount</span>
+                  <span className="font-medium text-slate-900 dark:text-white">{formatCurrency(Number(amount))}</span>
                 </div>
                 <div className="flex justify-between text-[13px]">
-                  <span className="text-slate-500">Fee</span>
-                  <span className="font-medium text-emerald-600">Free</span>
+                  <span className="text-slate-500 dark:text-slate-400">Fee</span>
+                  <span className="font-medium text-emerald-600 dark:text-emerald-400">Free</span>
                 </div>
-                <div className="border-t border-slate-200 pt-3 flex justify-between">
-                  <span className="text-[13px] font-semibold text-slate-900">Total</span>
-                  <span className="font-bold text-slate-900 text-lg tracking-tight">
+                <div className="border-t border-slate-200 dark:border-slate-700 pt-3 flex justify-between">
+                  <span className="text-[13px] font-semibold text-slate-900 dark:text-white">Total</span>
+                  <span className="font-bold text-slate-900 dark:text-white text-lg tracking-tight">
                     {formatCurrency(Number(amount))}
                   </span>
                 </div>
@@ -210,9 +210,9 @@ export default function TopupPage() {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-slate-200/80 p-5">
+      <div className="bg-white dark:bg-[#111827] rounded-xl border border-slate-200/80 dark:border-slate-700/50 p-5">
         <div className="flex items-start gap-4">
-          <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="10" />
               <line x1="12" y1="16" x2="12" y2="12" />
@@ -220,8 +220,8 @@ export default function TopupPage() {
             </svg>
           </div>
           <div>
-            <h3 className="text-[13px] font-semibold text-slate-900 mb-1">Instant Top Up</h3>
-            <p className="text-[12px] text-slate-500 leading-relaxed">
+            <h3 className="text-[13px] font-semibold text-slate-900 dark:text-white mb-1">Instant Top Up</h3>
+            <p className="text-[12px] text-slate-500 dark:text-slate-400 leading-relaxed">
               Funds are added to your wallet instantly. There are no fees for top-ups on NeoBank.
               Premium members enjoy higher limits and priority processing.
             </p>

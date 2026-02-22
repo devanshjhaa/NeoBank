@@ -139,24 +139,24 @@ export default function SignupPage() {
         </div>
       </div>
 
-      <div className="w-full lg:w-[40%] flex items-center justify-center bg-white px-6 py-12 sm:px-12 lg:px-14">
+      <div className="w-full lg:w-[40%] flex items-center justify-center bg-white dark:bg-slate-950 px-6 py-12 sm:px-12 lg:px-14">
         <div className="w-full max-w-[420px]">
           <div className="mb-10">
             <LogoIcon size={44} />
           </div>
 
           <div className="mb-1">
-            <p className="text-sm text-slate-500">Welcome to <span className="font-semibold text-slate-700">NeoBank</span></p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Welcome to <span className="font-semibold text-slate-700 dark:text-slate-200">NeoBank</span></p>
           </div>
           <div className="mb-8">
-            <h1 className="text-[26px] font-bold text-slate-900 leading-tight">
+            <h1 className="text-[26px] font-bold text-slate-900 dark:text-white leading-tight">
               Get started with your<br />email address
             </h1>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <div className="space-y-1.5">
-              <Label htmlFor="email" className="text-sm font-medium text-slate-700">
+              <Label htmlFor="email" className="text-sm font-medium text-slate-700 dark:text-slate-300">
                 Email address
               </Label>
               <Input
@@ -174,7 +174,7 @@ export default function SignupPage() {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="password" className="text-sm font-medium text-slate-700">
+              <Label htmlFor="password" className="text-sm font-medium text-slate-700 dark:text-slate-300">
                 Password
               </Label>
               <Input
@@ -189,12 +189,12 @@ export default function SignupPage() {
               {errors.password ? (
                 <p className="text-xs text-red-500 mt-1">{errors.password.message}</p>
               ) : (
-                <p className="text-xs text-slate-400 mt-1">Min. 8 chars, uppercase, lowercase, number & special character</p>
+                <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">Min. 8 chars, uppercase, lowercase, number & special character</p>
               )}
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="confirmPassword" className="text-sm font-medium text-slate-700">
+              <Label htmlFor="confirmPassword" className="text-sm font-medium text-slate-700 dark:text-slate-300">
                 Confirm password
               </Label>
               <Input
@@ -228,10 +228,10 @@ export default function SignupPage() {
 
           <div className="relative my-7">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-200" />
+              <div className="w-full border-t border-slate-200 dark:border-slate-700" />
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="bg-white px-3 text-slate-400">or continue with</span>
+              <span className="bg-white dark:bg-slate-950 px-3 text-slate-400 dark:text-slate-500">or continue with</span>
             </div>
           </div>
 

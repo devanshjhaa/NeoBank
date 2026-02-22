@@ -177,7 +177,7 @@ export default function VerifyOtpPage() {
         </div>
       </div>
 
-      <div className="w-full lg:w-[40%] flex items-center justify-center bg-white px-6 py-12 sm:px-12 lg:px-14">
+      <div className="w-full lg:w-[40%] flex items-center justify-center bg-white dark:bg-slate-950 px-6 py-12 sm:px-12 lg:px-14">
         <div className="w-full max-w-[420px]">
           <div className="lg:hidden mb-8">
             <Link href="/" className="flex items-center gap-2">
@@ -219,16 +219,16 @@ export default function VerifyOtpPage() {
 
           {step === "phone" ? (
             <div>
-              <h1 className="text-2xl font-bold text-slate-900">Link your phone number</h1>
-              <p className="mt-2 text-sm text-slate-500">
+              <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Link your phone number</h1>
+              <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
                 This number will be linked to your wallet for transactions and payouts.
               </p>
 
               <div className="mt-6 space-y-5">
                 <div className="space-y-1.5">
-                  <Label htmlFor="phone" className="text-sm font-medium text-slate-700">Phone number</Label>
+                  <Label htmlFor="phone" className="text-sm font-medium text-slate-700 dark:text-slate-300">Phone number</Label>
                   <div className="flex gap-2">
-                    <div className="flex items-center justify-center h-10 px-3 rounded-lg border border-slate-300 bg-slate-50 text-sm text-slate-600 select-none">
+                    <div className="flex items-center justify-center h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 text-sm text-slate-600 dark:text-slate-300 select-none">
                       +91
                     </div>
                     <Input
@@ -262,14 +262,14 @@ export default function VerifyOtpPage() {
                   )}
                 </Button>
 
-                <div className="bg-blue-50 border border-blue-100 rounded-lg p-3 flex items-start gap-3">
+                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/50 rounded-lg p-3 flex items-start gap-3">
                   <svg className="h-5 w-5 text-blue-500 mt-0.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <rect width="20" height="16" x="2" y="4" rx="2" />
                     <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
                   </svg>
                   <div>
-                    <p className="text-xs font-medium text-blue-800">Verification via email</p>
-                    <p className="text-xs text-blue-600 mt-0.5">
+                    <p className="text-xs font-medium text-blue-800 dark:text-blue-300">Verification via email</p>
+                    <p className="text-xs text-blue-600 dark:text-blue-400 mt-0.5">
                       A 6-digit code will be sent to <span className="font-semibold">{email}</span> to verify your identity.
                     </p>
                   </div>
@@ -278,9 +278,9 @@ export default function VerifyOtpPage() {
             </div>
           ) : (
             <div>
-              <h1 className="text-2xl font-bold text-slate-900">Verify your identity</h1>
-              <p className="mt-2 text-sm text-slate-500">
-                Enter the 6-digit code sent to <span className="font-medium text-slate-700">{email}</span>
+              <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Verify your identity</h1>
+              <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+                Enter the 6-digit code sent to <span className="font-medium text-slate-700 dark:text-slate-200">{email}</span>
               </p>
 
               <div className="mt-6 space-y-6">
@@ -296,7 +296,7 @@ export default function VerifyOtpPage() {
                       onChange={(e) => handleOtpChange(i, e.target.value)}
                       onKeyDown={(e) => handleOtpKeyDown(i, e)}
                       disabled={isLoading}
-                      className="w-12 h-14 text-center text-xl font-semibold rounded-lg border-2 border-slate-200 text-slate-900 bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 outline-none transition-all disabled:opacity-50"
+                      className="w-12 h-14 text-center text-xl font-semibold rounded-lg border-2 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white bg-white dark:bg-slate-800 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 outline-none transition-all disabled:opacity-50"
                     />
                   ))}
                 </div>
@@ -343,8 +343,8 @@ export default function VerifyOtpPage() {
             </div>
           )}
 
-          <div className="mt-8 pt-6 border-t border-slate-100 text-center">
-            <p className="text-sm text-slate-500">
+          <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 text-center">
+            <p className="text-sm text-slate-500 dark:text-slate-400">
               Already verified?{" "}
               <Link href="/login" className="font-semibold text-blue-600 hover:text-blue-700">
                 Sign in

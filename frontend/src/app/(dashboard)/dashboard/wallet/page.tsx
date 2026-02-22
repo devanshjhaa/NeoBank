@@ -29,11 +29,11 @@ export default function WalletPage() {
   if (isLoading) {
     return (
       <div className="space-y-6 animate-pulse">
-        <div className="h-7 w-32 bg-slate-200 rounded-lg" />
-        <div className="bg-white rounded-2xl border border-slate-100 h-[220px]" />
+        <div className="h-7 w-32 bg-slate-200 dark:bg-slate-700 rounded-lg" />
+        <div className="bg-white dark:bg-[#111827] rounded-2xl border border-slate-100 dark:border-slate-700/50 h-[220px]" />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="bg-white rounded-xl border border-slate-100 h-[90px]" />
+            <div key={i} className="bg-white dark:bg-[#111827] rounded-xl border border-slate-100 dark:border-slate-700/50 h-[90px]" />
           ))}
         </div>
       </div>
@@ -85,8 +85,8 @@ export default function WalletPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-[22px] font-bold text-slate-900 tracking-tight">My Wallet</h1>
-        <p className="text-[13px] text-slate-500 mt-0.5">Manage your digital wallet and funds</p>
+        <h1 className="text-[22px] font-bold text-slate-900 dark:text-white tracking-tight">My Wallet</h1>
+        <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-0.5">Manage your digital wallet and funds</p>
       </div>
 
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-700 p-6 lg:p-8 text-white">
@@ -142,7 +142,7 @@ export default function WalletPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {actions.map((action) => (
           <Link key={action.href} href={action.href}>
-            <div className="bg-white rounded-xl border border-slate-200/80 p-5 group hover:shadow-md hover:shadow-slate-200/60 transition-all duration-200 cursor-pointer">
+            <div className="bg-white dark:bg-[#111827] rounded-xl border border-slate-200/80 dark:border-slate-700/50 p-5 group hover:shadow-md hover:shadow-slate-200/60 dark:hover:shadow-black/20 transition-all duration-200 cursor-pointer">
               <div className="flex items-center gap-4">
                 <div className={`w-11 h-11 rounded-xl ${action.bg} flex items-center justify-center transition-colors`}>
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={action.stroke} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -150,10 +150,10 @@ export default function WalletPage() {
                   </svg>
                 </div>
                 <div className="flex-1">
-                  <p className="text-[13px] font-semibold text-slate-900">{action.label}</p>
-                  <p className="text-[11px] text-slate-400">{action.desc}</p>
+                  <p className="text-[13px] font-semibold text-slate-900 dark:text-white">{action.label}</p>
+                  <p className="text-[11px] text-slate-400 dark:text-slate-500">{action.desc}</p>
                 </div>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-slate-300 group-hover:text-slate-400 group-hover:translate-x-0.5 transition-all shrink-0">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-slate-300 dark:text-slate-600 group-hover:text-slate-400 dark:group-hover:text-slate-500 group-hover:translate-x-0.5 transition-all shrink-0">
                   <polyline points="9 18 15 12 9 6" />
                 </svg>
               </div>
@@ -162,12 +162,12 @@ export default function WalletPage() {
         ))}
       </div>
 
-      <div className="bg-white rounded-xl border border-slate-200/80 overflow-hidden">
-        <div className="px-5 py-4 border-b border-slate-100">
-          <h2 className="text-[13px] font-semibold text-slate-900">Wallet Details</h2>
-          <p className="text-[11px] text-slate-400 mt-0.5">Information about your digital wallet</p>
+      <div className="bg-white dark:bg-[#111827] rounded-xl border border-slate-200/80 dark:border-slate-700/50 overflow-hidden">
+        <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-700/50">
+          <h2 className="text-[13px] font-semibold text-slate-900 dark:text-white">Wallet Details</h2>
+          <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">Information about your digital wallet</p>
         </div>
-        <div className="divide-y divide-slate-100">
+        <div className="divide-y divide-slate-100 dark:divide-slate-700/50">
           {[
             { label: "Wallet ID", value: wallet?.walletId ?? "N/A", mono: true },
             { label: "Currency", value: wallet?.currency || "INR" },
@@ -178,8 +178,8 @@ export default function WalletPage() {
             },
           ].map((row) => (
             <div key={row.label} className="flex items-center justify-between px-5 py-4">
-              <span className="text-[13px] text-slate-500">{row.label}</span>
-              <span className={`text-[13px] font-semibold ${row.color || "text-slate-900"} ${row.mono ? "font-mono" : ""}`}>
+              <span className="text-[13px] text-slate-500 dark:text-slate-400">{row.label}</span>
+              <span className={`text-[13px] font-semibold ${row.color || "text-slate-900 dark:text-white"} ${row.mono ? "font-mono" : ""}`}>
                 {row.value}
               </span>
             </div>
