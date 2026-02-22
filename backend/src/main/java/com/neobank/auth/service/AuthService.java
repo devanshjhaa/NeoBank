@@ -75,6 +75,12 @@ public class AuthService {
             throw ApiException.badRequest("INVALID_OTP", "Invalid or expired OTP");
         }
 
+        userRepository.findByPhone(phone).ifPresent(existing -> {
+            if (!existing.getId().equals(user.getId())) {
+                throw ApiException.conflict("PHONE_TAKEN", "This phone number is already linked to another account");
+            }
+        });
+
         user.verifyPhone(phone);
         userRepository.save(user);
 
