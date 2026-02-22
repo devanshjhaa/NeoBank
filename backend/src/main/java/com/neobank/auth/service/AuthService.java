@@ -94,15 +94,19 @@ public class AuthService {
         return jwtProvider.createToken(user.getId(), user.getEmail(), user.getTier());
     }
 
+    public record GoogleLoginResult(String token, boolean newUser) {}
+
     @Transactional
-    public String loginWithGoogle(String idToken) {
+    public GoogleLoginResult loginWithGoogle(String idToken) {
         GoogleTokenVerifier.GoogleUser googleUser = googleTokenVerifier.verify(idToken);
 
+        boolean[] isNew = { false };
         User user = userRepository.findByEmail(googleUser.email())
                 .orElseGet(() -> {
                     User newUser = User.createWithGoogle(googleUser.email(), googleUser.sub());
                     userRepository.save(newUser);
                     walletService.createWalletIfAbsent(newUser.getId());
+                    isNew[0] = true;
                     log.info("New Google user created email={}", googleUser.email());
                     return newUser;
                 });
@@ -111,8 +115,11 @@ public class AuthService {
             throw ApiException.forbidden("Account is suspended");
         }
 
-        log.info("Google login email={}", googleUser.email());
+        boolean needsPhoneVerification = isNew[0] || !user.isPhoneVerified();
 
-        return jwtProvider.createToken(user.getId(), user.getEmail(), user.getTier());
+        log.info("Google login email={} newUser={}", googleUser.email(), needsPhoneVerification);
+
+        String token = jwtProvider.createToken(user.getId(), user.getEmail(), user.getTier());
+        return new GoogleLoginResult(token, needsPhoneVerification);
     }
 }

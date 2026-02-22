@@ -39,7 +39,7 @@ public class AuthController {
 
     @PostMapping("/google")
     public AuthResponse googleLogin(@Valid @RequestBody GoogleAuthRequest req) {
-        String token = authService.loginWithGoogle(req.idToken());
-        return new AuthResponse(token);
+        AuthService.GoogleLoginResult result = authService.loginWithGoogle(req.idToken());
+        return new AuthResponse(result.token(), result.newUser());
     }
 }

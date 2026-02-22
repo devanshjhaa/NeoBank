@@ -29,9 +29,19 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       const response = await authApi.googleAuth({ idToken });
-      localStorage.setItem("accessToken", response.accessToken);
-      toast.success("Welcome back!");
-      router.push("/dashboard");
+      if (response.newUser) {
+        localStorage.setItem("accessToken", response.accessToken);
+        const payload = JSON.parse(atob(response.accessToken.split(".")[1]));
+        localStorage.setItem("pendingEmail", payload.sub || payload.email || "");
+        toast.success("Almost there!", {
+          description: "Verify your phone number to activate your wallet.",
+        });
+        router.push("/verify-otp");
+      } else {
+        localStorage.setItem("accessToken", response.accessToken);
+        toast.success("Welcome back!");
+        router.push("/dashboard");
+      }
     } catch (error: unknown) {
       const apiError = error as { message?: string };
       toast.error("Google sign-in failed", {

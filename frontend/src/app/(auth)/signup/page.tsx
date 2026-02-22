@@ -41,9 +41,19 @@ export default function SignupPage() {
     setIsLoading(true);
     try {
       const response = await authApi.googleAuth({ idToken });
-      localStorage.setItem("accessToken", response.accessToken);
-      toast.success("Welcome to NeoBank!");
-      router.push("/dashboard");
+      if (response.newUser) {
+        localStorage.setItem("accessToken", response.accessToken);
+        const payload = JSON.parse(atob(response.accessToken.split(".")[1]));
+        localStorage.setItem("pendingEmail", payload.sub || payload.email || "");
+        toast.success("Account created!", {
+          description: "Verify your phone number to activate your wallet.",
+        });
+        router.push("/verify-otp");
+      } else {
+        localStorage.setItem("accessToken", response.accessToken);
+        toast.success("Welcome to NeoBank!");
+        router.push("/dashboard");
+      }
     } catch (error: unknown) {
       const apiError = error as { message?: string };
       toast.error("Google sign-up failed", {

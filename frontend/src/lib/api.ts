@@ -40,6 +40,7 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
 
 export interface AuthResponse {
   accessToken: string;
+  newUser?: boolean;
 }
 
 export interface WalletResponse {

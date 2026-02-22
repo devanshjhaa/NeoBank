@@ -1,5 +1,10 @@
 package com.neobank.auth.dto;
 
 public record AuthResponse(
-        String accessToken
-) {}
+        String accessToken,
+        boolean newUser
+) {
+    public AuthResponse(String accessToken) {
+        this(accessToken, false);
+    }
+}
