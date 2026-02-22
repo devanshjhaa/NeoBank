@@ -157,20 +157,19 @@ export default function VerifyOtpPage() {
 
           <div className="max-w-md">
             <h2 className="text-3xl xl:text-4xl font-bold text-white leading-tight">
-              One last step to
+              Complete your
               <br />
-              secure your{" "}
-              <span className="text-blue-400">wallet</span>
+              <span className="text-blue-400">profile</span> setup
             </h2>
             <p className="mt-5 text-slate-400 text-base leading-relaxed">
-              We&apos;ll send a verification code to your email to confirm your phone number.
-              Your wallet will be activated instantly after verification.
+              Link your phone number to your wallet, then verify your identity
+              via a code sent to your email. Your wallet activates instantly.
             </p>
 
             <div className="mt-8 flex flex-col gap-4">
               {[
                 { num: "1", label: "Create account", done: true },
-                { num: "2", label: "Verify phone number", done: false },
+                { num: "2", label: "Link phone & verify email", done: false },
                 { num: "3", label: "Start transacting", done: false },
               ].map((item) => (
                 <div key={item.num} className="flex items-center gap-3">
@@ -252,12 +251,12 @@ export default function VerifyOtpPage() {
 
           <div className="mb-8">
             <h1 className="text-2xl font-bold text-slate-900">
-              {step === "phone" ? "Link your phone number" : "Check your email"}
+              {step === "phone" ? "Link your phone number" : "Verify your identity"}
             </h1>
             <p className="mt-2 text-sm text-slate-500">
               {step === "phone"
-                ? "Enter your phone number to link it to your account. We'll send a verification code to your email."
-                : `We sent a 6-digit code to ${email}`}
+                ? "This number will be linked to your wallet for transactions and payouts."
+                : `We sent a 6-digit verification code to ${email}`}
             </p>
           </div>
 
@@ -298,13 +297,17 @@ export default function VerifyOtpPage() {
                     Sending...
                   </span>
                 ) : (
-                  "Send code to my email"
+                  "Continue"
                 )}
               </Button>
 
-              <p className="text-xs text-slate-400 text-center">
-                A 6-digit code will be sent to <span className="font-medium text-slate-500">{email}</span>
-              </p>
+              <div className="flex items-center gap-2 justify-center text-xs text-slate-400">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect width="20" height="16" x="2" y="4" rx="2" />
+                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                </svg>
+                <span>A verification code will be sent to <span className="font-medium text-slate-500">{email}</span></span>
+              </div>
             </div>
           ) : (
             <div className="space-y-6">
