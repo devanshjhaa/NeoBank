@@ -6,11 +6,14 @@ declare global {
       accounts: {
         id: {
           initialize: (config: GoogleInitConfig) => void;
-          prompt: () => void;
+          prompt: (momentListener?: (notification: PromptMomentNotification) => void) => void;
+          cancel: () => void;
           renderButton: (element: HTMLElement, config: GoogleButtonConfig) => void;
         };
       };
     };
+    __gsi_loaded?: boolean;
+    __gsi_loading?: boolean;
   }
 }
 
@@ -35,7 +38,47 @@ interface GoogleCredentialResponse {
   select_by: string;
 }
 
+interface PromptMomentNotification {
+  isNotDisplayed: () => boolean;
+  isSkippedMoment: () => boolean;
+  isDismissedMoment: () => boolean;
+  getNotDisplayedReason: () => string;
+  getSkippedReason: () => string;
+  getDismissedReason: () => string;
+}
+
 const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "";
+
+function loadGsiScript(): Promise<void> {
+  return new Promise((resolve) => {
+    if (window.__gsi_loaded && window.google?.accounts) {
+      resolve();
+      return;
+    }
+
+    if (window.__gsi_loading) {
+      const check = setInterval(() => {
+        if (window.__gsi_loaded && window.google?.accounts) {
+          clearInterval(check);
+          resolve();
+        }
+      }, 50);
+      return;
+    }
+
+    window.__gsi_loading = true;
+    const script = document.createElement("script");
+    script.src = "https://accounts.google.com/gsi/client";
+    script.async = true;
+    script.defer = true;
+    script.onload = () => {
+      window.__gsi_loaded = true;
+      window.__gsi_loading = false;
+      resolve();
+    };
+    document.head.appendChild(script);
+  });
+}
 
 export function useGoogleAuth(onToken: (idToken: string) => void) {
   const callbackRef = useRef(onToken);
@@ -46,13 +89,10 @@ export function useGoogleAuth(onToken: (idToken: string) => void) {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+    let cancelled = false;
 
-    const script = document.createElement("script");
-    script.src = "https://accounts.google.com/gsi/client";
-    script.async = true;
-    script.defer = true;
-
-    script.onload = () => {
+    loadGsiScript().then(() => {
+      if (cancelled) return;
       window.google?.accounts.id.initialize({
         client_id: GOOGLE_CLIENT_ID,
         callback: (response: GoogleCredentialResponse) => {
@@ -61,12 +101,11 @@ export function useGoogleAuth(onToken: (idToken: string) => void) {
         use_fedcm_for_prompt: false,
         cancel_on_tap_outside: false,
       });
-    };
-
-    document.head.appendChild(script);
+    });
 
     return () => {
-      document.head.removeChild(script);
+      cancelled = true;
+      window.google?.accounts.id.cancel();
     };
   }, []);
 
