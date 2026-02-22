@@ -18,6 +18,8 @@ interface GoogleInitConfig {
   client_id: string;
   callback: (response: GoogleCredentialResponse) => void;
   auto_select?: boolean;
+  use_fedcm_for_prompt?: boolean;
+  cancel_on_tap_outside?: boolean;
 }
 
 interface GoogleButtonConfig {
@@ -37,7 +39,10 @@ const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "";
 
 export function useGoogleAuth(onToken: (idToken: string) => void) {
   const callbackRef = useRef(onToken);
-  callbackRef.current = onToken;
+
+  useEffect(() => {
+    callbackRef.current = onToken;
+  }, [onToken]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -53,6 +58,8 @@ export function useGoogleAuth(onToken: (idToken: string) => void) {
         callback: (response: GoogleCredentialResponse) => {
           callbackRef.current(response.credential);
         },
+        use_fedcm_for_prompt: false,
+        cancel_on_tap_outside: false,
       });
     };
 
