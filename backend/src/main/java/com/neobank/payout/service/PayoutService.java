@@ -1,5 +1,7 @@
 package com.neobank.payout.service;
 
+import com.neobank.bankaccount.entity.BankAccount;
+import com.neobank.bankaccount.service.BankAccountService;
 import com.neobank.common.outbox.OutboxService;
 import com.neobank.ledger.entity.LedgerEntry;
 import com.neobank.ledger.service.LedgerService;
@@ -20,15 +22,18 @@ public class PayoutService {
         private final WalletService walletService;
         private final LedgerService ledgerService;
         private final OutboxService outboxService;
+        private final BankAccountService bankAccountService;
 
         public PayoutService(PayoutRepository payoutRepository,
                         WalletService walletService,
                         LedgerService ledgerService,
-                        OutboxService outboxService) {
+                        OutboxService outboxService,
+                        BankAccountService bankAccountService) {
                 this.payoutRepository = payoutRepository;
                 this.walletService = walletService;
                 this.ledgerService = ledgerService;
                 this.outboxService = outboxService;
+                this.bankAccountService = bankAccountService;
         }
 
         @Transactional
@@ -40,6 +45,11 @@ public class PayoutService {
                 var existing = payoutRepository.findByIdempotencyKey(idempotencyKey);
                 if (existing.isPresent())
                         return existing.get();
+
+                BankAccount bankAccount = bankAccountService.getUserAccount(userId, bankAccountId);
+                if (!bankAccount.isVerified()) {
+                        throw new IllegalStateException("Bank account is not verified");
+                }
 
                 Payout payout = Payout.init(userId, bankAccountId, amount, idempotencyKey);
                 payoutRepository.save(payout);

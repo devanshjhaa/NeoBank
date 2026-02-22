@@ -64,8 +64,8 @@ class PayoutFlowTest {
                 walletService.creditWallet(user.getId(), new BigDecimal("1000"));
 
                 Long bankAccountId = jdbcTemplate.queryForObject(
-                                "INSERT INTO bank_accounts (user_id, account_number, ifsc_code, holder_name) " +
-                                                "VALUES (?, '1234567890', 'SBIN0001234', 'Test User') RETURNING id",
+                                "INSERT INTO bank_accounts (user_id, account_number, ifsc_code, holder_name, verified) " +
+                                                "VALUES (?, '1234567890', 'SBIN0001234', 'Test User', true) RETURNING id",
                                 Long.class,
                                 user.getId());
 

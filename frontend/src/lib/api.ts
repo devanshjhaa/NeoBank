@@ -73,6 +73,16 @@ export interface PayoutResponse {
   createdAt: string;
 }
 
+export interface BankAccountResponse {
+  id: number;
+  accountNumber: string;
+  maskedAccountNumber: string;
+  ifscCode: string;
+  holderName: string;
+  verified: boolean;
+  createdAt: string;
+}
+
 export interface UserSummary {
   id: number;
   email: string;
@@ -207,6 +217,23 @@ export const payoutApi = {
       method: "POST",
       body: JSON.stringify(data),
     }),
+};
+
+/* ------------------------------------------------------------------ */
+/*  Bank Accounts                                                      */
+/* ------------------------------------------------------------------ */
+
+export const bankAccountApi = {
+  list: () => request<BankAccountResponse[]>("/bank-accounts"),
+
+  link: (data: { accountNumber: string; ifscCode: string; holderName: string }) =>
+    request<BankAccountResponse>("/bank-accounts", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
+  remove: (id: number) =>
+    request<void>(`/bank-accounts/${id}`, { method: "DELETE" }),
 };
 
 /* ------------------------------------------------------------------ */
