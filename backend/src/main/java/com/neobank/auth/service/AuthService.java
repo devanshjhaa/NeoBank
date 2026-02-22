@@ -62,6 +62,15 @@ public class AuthService {
     }
 
     public void requestOtp(String email, String phone) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> ApiException.notFound("User not found"));
+
+        userRepository.findByPhone(phone).ifPresent(existing -> {
+            if (!existing.getId().equals(user.getId())) {
+                throw ApiException.conflict("PHONE_TAKEN", "This phone number is already linked to another account");
+            }
+        });
+
         otpService.sendOtp(email, phone);
     }
 
@@ -74,12 +83,6 @@ public class AuthService {
             log.warn("OTP verification failed for email={}", email);
             throw ApiException.badRequest("INVALID_OTP", "Invalid or expired OTP");
         }
-
-        userRepository.findByPhone(phone).ifPresent(existing -> {
-            if (!existing.getId().equals(user.getId())) {
-                throw ApiException.conflict("PHONE_TAKEN", "This phone number is already linked to another account");
-            }
-        });
 
         user.verifyPhone(phone);
         userRepository.save(user);
