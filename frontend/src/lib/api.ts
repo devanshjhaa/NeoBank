@@ -27,7 +27,8 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
   const data = await res.json().catch(() => ({}));
 
   if (!res.ok) {
-    throw new ApiError(data.message || data.error || `Request failed (${res.status})`, res.status);
+    const msg = data.message || data.error?.message || data.error || `Request failed (${res.status})`;
+    throw new ApiError(typeof msg === "string" ? msg : `Request failed (${res.status})`, res.status);
   }
 
   return data as T;

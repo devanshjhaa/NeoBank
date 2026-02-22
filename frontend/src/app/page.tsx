@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
+import { LogoIcon } from "@/components/logo";
 
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    Locomotive Scroll v5 â€” smooth scroll
@@ -114,7 +115,7 @@ const QUICK_ACTIONS = [
   { label: "Make Payouts", icon: "M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" },
   { label: "Go Premium", icon: "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" },
   { label: "View History", icon: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" },
-  { label: "Something else?", icon: "M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" },
+  { label: "Analyse", icon: "M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" },
 ];
 
 const BRANDS = ["airbnb", "facebook", "WhatsApp", "airtel", "CRED", "BookMyShow", "OLA", "zomato", "blinkit", "zepto"];
@@ -192,11 +193,7 @@ export default function Home() {
         <nav className="max-w-[1280px] mx-auto px-6 lg:px-8 h-[64px] flex items-center justify-between">
           <div className="flex items-center gap-10">
             <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-blue-600 grid place-items-center">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M19 7V4a1 1 0 00-1-1H5a2 2 0 000 4h15a1 1 0 011 1v4h-3a2 2 0 000 4h3a1 1 0 001-1v-2a1 1 0 00-1-1" />
-                </svg>
-              </div>
+              <LogoIcon size={32} />
               <span className="font-bold text-[18px] text-slate-900 tracking-tight">NeoBank</span>
             </Link>
 
@@ -284,9 +281,7 @@ export default function Home() {
               <div className="w-[400px] rounded-2xl bg-white shadow-2xl shadow-blue-900/10 border border-slate-200/60 overflow-hidden" data-scroll data-scroll-speed="-0.5">
                 <div className="px-5 py-3 border-b border-slate-100 flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="w-5 h-5 rounded bg-blue-600 grid place-items-center">
-                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><path d="M19 7V4a1 1 0 00-1-1H5a2 2 0 000 4h15a1 1 0 011 1v4h-3a2 2 0 000 4h3a1 1 0 001-1v-2a1 1 0 00-1-1" /></svg>
-                    </div>
+                    <LogoIcon size={20} />
                     <span className="text-[11px] font-bold text-slate-700">NeoBank</span>
                   </div>
                   <div className="flex gap-1.5">
@@ -410,7 +405,7 @@ export default function Home() {
                 Everything you need to<br />manage your money
               </h2>
               <p className="mt-4 text-[16px] text-slate-500 leading-relaxed">
-                From instant transfers to premium banking â€” NeoBank has you covered.
+                From instant transfers to premium banking  NeoBank has you covered.
               </p>
             </div>
           </Reveal>
@@ -632,9 +627,7 @@ export default function Home() {
           <div className="grid grid-cols-2 md:grid-cols-6 gap-8 lg:gap-12">
             <div className="col-span-2">
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-8 h-8 rounded-lg bg-blue-600 grid place-items-center">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><path d="M19 7V4a1 1 0 00-1-1H5a2 2 0 000 4h15a1 1 0 011 1v4h-3a2 2 0 000 4h3a1 1 0 001-1v-2a1 1 0 00-1-1" /></svg>
-                </div>
+                <LogoIcon size={32} />
                 <span className="font-bold text-[17px] text-slate-900">NeoBank</span>
               </div>
               <p className="text-[13px] text-slate-500 leading-relaxed max-w-xs">
@@ -669,9 +662,7 @@ export default function Home() {
                 links: [
                   { label: "Dashboard", href: "/dashboard" },
                   { label: "Top Up", href: "/dashboard/topup" },
-                  { label: "Settings", href: "/dashboard/settings" },
-                  { label: "Sign Up", href: "/signup" },
-                  { label: "Login", href: "/login" },
+                  { label: "Settings", href: "/dashboard/settings" }
                 ],
               },
               {

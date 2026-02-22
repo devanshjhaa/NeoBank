@@ -11,11 +11,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { authApi } from "@/lib/api";
 import { toast } from "sonner";
+import { LogoIcon } from "@/components/logo";
 
 const signupSchema = z
   .object({
     email: z.string().email("Please enter a valid email address"),
-    password: z.string().min(8, "Password must be at least 8 characters"),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .regex(/[A-Z]/, "Must contain at least one uppercase letter")
+      .regex(/[a-z]/, "Must contain at least one lowercase letter")
+      .regex(/[0-9]/, "Must contain at least one number")
+      .regex(/[^A-Za-z0-9]/, "Must contain at least one special character"),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -81,11 +88,7 @@ export default function SignupPage() {
 
         <div className="relative z-10 flex flex-col justify-between w-full p-10 xl:p-14 h-full">
           <Link href="/" className="flex items-center gap-2.5 w-fit">
-            <div className="h-9 w-9 rounded-lg bg-blue-600 grid place-items-center shadow-lg">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1" />
-              </svg>
-            </div>
+            <LogoIcon size={36} />
             <span className="text-white font-bold text-xl tracking-tight drop-shadow-md">NeoBank</span>
           </Link>
 
@@ -119,11 +122,7 @@ export default function SignupPage() {
       <div className="w-full lg:w-[40%] flex items-center justify-center bg-white px-6 py-12 sm:px-12 lg:px-14">
         <div className="w-full max-w-[420px]">
           <div className="mb-10">
-            <div className="h-11 w-11 rounded-xl bg-blue-600 grid place-items-center shadow-sm">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1" />
-              </svg>
-            </div>
+            <LogoIcon size={44} />
           </div>
 
           <div className="mb-1">
@@ -161,14 +160,16 @@ export default function SignupPage() {
               <Input
                 id="password"
                 type="password"
-                placeholder="Min. 8 characters"
+                placeholder="Create a strong password"
                 autoComplete="new-password"
                 disabled={isLoading}
                 className="h-11"
                 {...register("password")}
               />
-              {errors.password && (
+              {errors.password ? (
                 <p className="text-xs text-red-500 mt-1">{errors.password.message}</p>
+              ) : (
+                <p className="text-xs text-slate-400 mt-1">Min. 8 chars, uppercase, lowercase, number & special character</p>
               )}
             </div>
 

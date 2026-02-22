@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { authApi } from "@/lib/api";
+import { LogoIcon } from "@/components/logo";
 import { toast } from "sonner";
 
 const loginSchema = z.object({
@@ -67,11 +68,7 @@ export default function LoginPage() {
 
         <div className="relative z-10 flex flex-col justify-between w-full p-10 xl:p-14 h-full">
           <Link href="/" className="flex items-center gap-2.5 w-fit">
-            <div className="h-9 w-9 rounded-lg bg-blue-600 grid place-items-center shadow-lg">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1" />
-              </svg>
-            </div>
+            <LogoIcon size={36} />
             <span className="text-white font-bold text-xl tracking-tight drop-shadow-md">NeoBank</span>
           </Link>
 
@@ -105,11 +102,7 @@ export default function LoginPage() {
       <div className="w-full lg:w-[40%] flex items-center justify-center bg-white px-6 py-12 sm:px-12 lg:px-14">
         <div className="w-full max-w-[420px]">
           <div className="mb-10">
-            <div className="h-11 w-11 rounded-xl bg-blue-600 grid place-items-center shadow-sm">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1" />
-              </svg>
-            </div>
+            <LogoIcon size={44} />
           </div>
 
           <div className="mb-1">
