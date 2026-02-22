@@ -21,16 +21,19 @@ public class AuthService {
     private final WalletService walletService;
     private final OtpService otpService;
     private final JwtProvider jwtProvider;
+    private final GoogleTokenVerifier googleTokenVerifier;
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
     public AuthService(UserRepository userRepository,
             WalletService walletService,
             OtpService otpService,
-            JwtProvider jwtProvider) {
+            JwtProvider jwtProvider,
+            GoogleTokenVerifier googleTokenVerifier) {
         this.userRepository = userRepository;
         this.walletService = walletService;
         this.otpService = otpService;
         this.jwtProvider = jwtProvider;
+        this.googleTokenVerifier = googleTokenVerifier;
     }
 
     @Transactional
@@ -78,6 +81,28 @@ public class AuthService {
         walletService.createWalletIfAbsent(user.getId());
 
         log.info("User verified email={}", email);
+
+        return jwtProvider.createToken(user.getId(), user.getEmail(), user.getTier());
+    }
+
+    @Transactional
+    public String loginWithGoogle(String idToken) {
+        GoogleTokenVerifier.GoogleUser googleUser = googleTokenVerifier.verify(idToken);
+
+        User user = userRepository.findByEmail(googleUser.email())
+                .orElseGet(() -> {
+                    User newUser = User.createWithGoogle(googleUser.email(), googleUser.sub());
+                    userRepository.save(newUser);
+                    walletService.createWalletIfAbsent(newUser.getId());
+                    log.info("New Google user created email={}", googleUser.email());
+                    return newUser;
+                });
+
+        if (!user.isActive()) {
+            throw ApiException.forbidden("Account is suspended");
+        }
+
+        log.info("Google login email={}", googleUser.email());
 
         return jwtProvider.createToken(user.getId(), user.getEmail(), user.getTier());
     }

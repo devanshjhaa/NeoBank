@@ -17,6 +17,12 @@ public class User extends BaseEntity {
     @Column(name = "password_hash")
     private String passwordHash;
 
+    @Column(name = "auth_provider", nullable = false)
+    private String authProvider = "LOCAL";
+
+    @Column(name = "provider_id")
+    private String providerId;
+
     @Column(unique = true)
     private String phone;
 
@@ -33,6 +39,15 @@ public class User extends BaseEntity {
         User user = new User();
         user.email = email;
         user.passwordHash = passwordHash;
+        user.authProvider = "LOCAL";
+        return user;
+    }
+
+    public static User createWithGoogle(String email, String providerId) {
+        User user = new User();
+        user.email = email;
+        user.authProvider = "GOOGLE";
+        user.providerId = providerId;
         return user;
     }
 

@@ -1,0 +1,3 @@
+ALTER TABLE users
+    ADD COLUMN auth_provider VARCHAR(20) NOT NULL DEFAULT 'LOCAL',
+    ADD COLUMN provider_id  TEXT;

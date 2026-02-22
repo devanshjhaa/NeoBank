@@ -120,6 +120,12 @@ export const authApi = {
       method: "POST",
       body: JSON.stringify(data),
     }),
+
+  googleAuth: (data: { idToken: string }) =>
+    request<AuthResponse>("/auth/google", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
 };
 
 /* ------------------------------------------------------------------ */

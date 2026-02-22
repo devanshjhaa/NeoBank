@@ -80,3 +80,6 @@ sms:
 jwt:
   secret: ${JWT_SECRET:neobank-dev-secret-key-change-in-production-must-be-at-least-32-chars}
   access-ttl-seconds: 1800
+
+google:
+  client-id: ${GOOGLE_CLIENT_ID:no-client-id-set}

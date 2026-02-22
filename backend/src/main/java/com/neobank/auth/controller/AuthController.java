@@ -36,4 +36,10 @@ public class AuthController {
         String token = authService.verifyOtp(req.email(), req.phone(), req.otp());
         return new AuthResponse(token);
     }
+
+    @PostMapping("/google")
+    public AuthResponse googleLogin(@Valid @RequestBody GoogleAuthRequest req) {
+        String token = authService.loginWithGoogle(req.idToken());
+        return new AuthResponse(token);
+    }
 }

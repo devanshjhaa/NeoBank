@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { authApi } from "@/lib/api";
 import { toast } from "sonner";
 import { LogoIcon } from "@/components/logo";
+import { useGoogleAuth } from "@/hooks/use-google-auth";
 
 const signupSchema = z
   .object({
@@ -35,6 +36,25 @@ type SignupFormData = z.infer<typeof signupSchema>;
 export default function SignupPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+
+  const handleGoogleToken = async (idToken: string) => {
+    setIsLoading(true);
+    try {
+      const response = await authApi.googleAuth({ idToken });
+      localStorage.setItem("accessToken", response.accessToken);
+      toast.success("Welcome to NeoBank!");
+      router.push("/dashboard");
+    } catch (error: unknown) {
+      const apiError = error as { message?: string };
+      toast.error("Google sign-up failed", {
+        description: apiError.message || "Please try again.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const { triggerGoogleLogin } = useGoogleAuth(handleGoogleToken);
 
   const {
     register,
@@ -215,7 +235,7 @@ export default function SignupPage() {
             </div>
           </div>
 
-          <Button variant="outline" type="button" disabled={isLoading} className="w-full h-11 text-sm font-medium">
+          <Button variant="outline" type="button" disabled={isLoading} onClick={triggerGoogleLogin} className="w-full h-11 text-sm font-medium">
             <svg className="mr-2 h-[18px] w-[18px]" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09Z" />
               <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23Z" />
