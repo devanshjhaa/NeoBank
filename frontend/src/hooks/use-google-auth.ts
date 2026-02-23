@@ -49,6 +49,20 @@ interface PromptMomentNotification {
 
 const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "";
 
+let gsiErrorFilterInstalled = false;
+
+function installGsiErrorFilter() {
+  if (gsiErrorFilterInstalled) return;
+  gsiErrorFilterInstalled = true;
+
+  const originalError = console.error;
+  console.error = (...args: unknown[]) => {
+    const msg = typeof args[0] === "string" ? args[0] : "";
+    if (msg.includes("[GSI_LOGGER]") && msg.includes("FedCM")) return;
+    originalError.apply(console, args);
+  };
+}
+
 function loadGsiScript(): Promise<void> {
   return new Promise((resolve) => {
     if (window.__gsi_loaded && window.google?.accounts) {
@@ -67,6 +81,7 @@ function loadGsiScript(): Promise<void> {
     }
 
     window.__gsi_loading = true;
+    installGsiErrorFilter();
     const script = document.createElement("script");
     script.src = "https://accounts.google.com/gsi/client";
     script.async = true;
@@ -82,17 +97,25 @@ function loadGsiScript(): Promise<void> {
 
 export function useGoogleAuth(onToken: (idToken: string) => void) {
   const callbackRef = useRef(onToken);
+  const initializedRef = useRef(false);
 
   useEffect(() => {
     callbackRef.current = onToken;
   }, [onToken]);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    let cancelled = false;
+    return () => {
+      if (initializedRef.current) {
+        window.google?.accounts.id.cancel();
+        initializedRef.current = false;
+      }
+    };
+  }, []);
 
-    loadGsiScript().then(() => {
-      if (cancelled) return;
+  const triggerGoogleLogin = useCallback(async () => {
+    await loadGsiScript();
+
+    if (!initializedRef.current) {
       window.google?.accounts.id.initialize({
         client_id: GOOGLE_CLIENT_ID,
         callback: (response: GoogleCredentialResponse) => {
@@ -101,15 +124,10 @@ export function useGoogleAuth(onToken: (idToken: string) => void) {
         use_fedcm_for_prompt: false,
         cancel_on_tap_outside: false,
       });
-    });
+      initializedRef.current = true;
+    }
 
-    return () => {
-      cancelled = true;
-      window.google?.accounts.id.cancel();
-    };
-  }, []);
-
-  const triggerGoogleLogin = useCallback(() => {
+    window.google?.accounts.id.cancel();
     window.google?.accounts.id.prompt();
   }, []);
 

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { LogoIcon } from "@/components/logo";
 
@@ -166,6 +167,11 @@ export default function Home() {
   const scrollRef = useLocoScroll();
   const [navShadow, setNavShadow] = useState(false);
   const [heroLoaded, setHeroLoaded] = useState(false);
+  const { setTheme } = useTheme();
+
+  useEffect(() => {
+    setTheme("light");
+  }, [setTheme]);
 
   useEffect(() => {
     const fn = () => setNavShadow(window.scrollY > 10);

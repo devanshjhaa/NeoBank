@@ -3,26 +3,38 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect, useCallback } from "react";
+import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 import { LogoIcon } from "@/components/logo";
 import { userApi } from "@/lib/api";
 
-const mainNav = [
+interface NavItem {
+  label: string;
+  href: string;
+  icon: React.ReactNode;
+  badge?: string;
+}
+
+interface NavGroup {
+  label: string;
+  icon: React.ReactNode;
+  items: NavItem[];
+}
+
+const homeNav: NavItem = {
+  label: "Home",
+  href: "/dashboard",
+  icon: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+      <polyline points="9 22 9 12 15 12 15 22" />
+    </svg>
+  ),
+};
+
+const navGroups: NavGroup[] = [
   {
-    label: "Overview",
-    href: "/dashboard",
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="3" width="7" height="7" rx="1" />
-        <rect x="14" y="3" width="7" height="7" rx="1" />
-        <rect x="3" y="14" width="7" height="7" rx="1" />
-        <rect x="14" y="14" width="7" height="7" rx="1" />
-      </svg>
-    ),
-  },
-  {
-    label: "Wallet",
-    href: "/dashboard/wallet",
+    label: "Money",
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
@@ -30,74 +42,117 @@ const mainNav = [
         <path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
       </svg>
     ),
+    items: [
+      {
+        label: "Wallet",
+        href: "/dashboard/wallet",
+        icon: (
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
+            <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
+            <path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
+          </svg>
+        ),
+      },
+      {
+        label: "Top Up",
+        href: "/dashboard/topup",
+        icon: (
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 2v20M2 12h20" />
+          </svg>
+        ),
+      },
+      {
+        label: "Send Money",
+        href: "/dashboard/transfer",
+        icon: (
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13" />
+            <polygon points="22 2 15 22 11 13 2 9 22 2" />
+          </svg>
+        ),
+      },
+    ],
   },
   {
-    label: "Top Up",
-    href: "/dashboard/topup",
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 2v20M2 12h20" />
-      </svg>
-    ),
-  },
-  {
-    label: "Send Money",
-    href: "/dashboard/transfer",
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <line x1="22" y1="2" x2="11" y2="13" />
-        <polygon points="22 2 15 22 11 13 2 9 22 2" />
-      </svg>
-    ),
-  },
-  {
-    label: "Payout",
-    href: "/dashboard/payout",
+    label: "Payouts",
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
         <line x1="1" y1="10" x2="23" y2="10" />
       </svg>
     ),
+    items: [
+      {
+        label: "Payout",
+        href: "/dashboard/payout",
+        icon: (
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="12" y1="19" x2="12" y2="5" />
+            <polyline points="5 12 12 5 19 12" />
+          </svg>
+        ),
+      },
+    ],
   },
   {
-    label: "History",
-    href: "/dashboard/history",
+    label: "Transactions",
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="12" cy="12" r="10" />
         <polyline points="12 6 12 12 16 14" />
       </svg>
     ),
+    items: [
+      {
+        label: "History",
+        href: "/dashboard/history",
+        icon: (
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
+          </svg>
+        ),
+      },
+    ],
   },
 ];
 
-const adminNav = [
-  {
-    label: "Users",
-    href: "/dashboard/admin/users",
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-        <circle cx="9" cy="7" r="4" />
-        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-      </svg>
-    ),
-  },
-  {
-    label: "Wallets",
-    href: "/dashboard/admin/wallets",
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="2" y="5" width="20" height="14" rx="2" />
-        <line x1="2" y1="10" x2="22" y2="10" />
-      </svg>
-    ),
-  },
-];
+const adminGroup: NavGroup = {
+  label: "Admin",
+  icon: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+    </svg>
+  ),
+  items: [
+    {
+      label: "Users",
+      href: "/dashboard/admin/users",
+      icon: (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
+      ),
+    },
+    {
+      label: "Wallets",
+      href: "/dashboard/admin/wallets",
+      icon: (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="2" y="5" width="20" height="14" rx="2" />
+          <line x1="2" y1="10" x2="22" y2="10" />
+        </svg>
+      ),
+    },
+  ],
+};
 
-const bottomNav = [
+const bottomNav: NavItem[] = [
   {
     label: "Premium",
     href: "/dashboard/premium",
@@ -119,6 +174,128 @@ const bottomNav = [
     ),
   },
 ];
+
+function DarkModeToggle() {
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return null;
+  const isDark = theme === "dark";
+  return (
+    <button
+      onClick={() => setTheme(isDark ? "light" : "dark")}
+      className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-all"
+    >
+      {isDark ? (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400 shrink-0">
+          <circle cx="12" cy="12" r="5" />
+          <line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" />
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+          <line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" />
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+        </svg>
+      ) : (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400 shrink-0">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+        </svg>
+      )}
+      Dark Mode
+      <div className={cn(
+        "ml-auto w-9 h-5 rounded-full p-0.5 transition-colors",
+        isDark ? "bg-blue-600" : "bg-slate-200 dark:bg-slate-600"
+      )}>
+        <div className={cn(
+          "w-4 h-4 rounded-full bg-white shadow-sm transition-transform",
+          isDark ? "translate-x-4" : "translate-x-0"
+        )} />
+      </div>
+    </button>
+  );
+}
+
+function CollapsibleGroup({
+  group,
+  pathname,
+  onLinkClick,
+}: {
+  group: NavGroup;
+  pathname: string;
+  onLinkClick: () => void;
+}) {
+  const hasActiveChild = group.items.some((i) =>
+    i.href === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(i.href)
+  );
+  const [open, setOpen] = useState(hasActiveChild);
+
+  useEffect(() => {
+    if (hasActiveChild) setOpen(true);
+  }, [hasActiveChild]);
+
+  return (
+    <div>
+      <button
+        onClick={() => setOpen(!open)}
+        className={cn(
+          "w-full flex items-center gap-3 px-3 py-[9px] rounded-lg text-[13px] font-medium transition-all duration-150 group",
+          hasActiveChild
+            ? "text-slate-900 dark:text-white"
+            : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-700/50"
+        )}
+      >
+        <span className={cn("shrink-0 transition-colors", hasActiveChild ? "text-blue-600 dark:text-blue-400" : "text-slate-400 dark:text-slate-500 group-hover:text-slate-500 dark:group-hover:text-slate-300")}>
+          {group.icon}
+        </span>
+        {group.label}
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className={cn(
+            "ml-auto text-slate-400 dark:text-slate-500 transition-transform duration-200",
+            open ? "rotate-180" : ""
+          )}
+        >
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+      </button>
+      <div
+        className={cn(
+          "overflow-hidden transition-all duration-200",
+          open ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
+        )}
+      >
+        <div className="ml-4 pl-3 border-l border-slate-200 dark:border-slate-700/50 space-y-0.5 py-1">
+          {group.items.map((item) => {
+            const active = item.href === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={onLinkClick}
+                className={cn(
+                  "flex items-center gap-2.5 px-3 py-[7px] rounded-lg text-[12.5px] font-medium transition-all duration-150 group/item",
+                  active
+                    ? "bg-blue-600 text-white shadow-sm shadow-blue-600/20"
+                    : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-700/50"
+                )}
+              >
+                <span className={cn("shrink-0 transition-colors", active ? "text-white" : "text-slate-400 dark:text-slate-500 group-hover/item:text-slate-500")}>
+                  {item.icon}
+                </span>
+                {item.label}
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function DashboardLayout({
   children,
@@ -178,12 +355,14 @@ export default function DashboardLayout({
   const isActive = (href: string) =>
     href === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(href);
 
+  const closeSidebar = () => setSidebarOpen(false);
+
   return (
     <div className="min-h-screen bg-[#f8f9fb] dark:bg-[#0b0f1a] transition-colors duration-300">
       {sidebarOpen && (
         <div
           className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 lg:hidden transition-opacity"
-          onClick={() => setSidebarOpen(false)}
+          onClick={closeSidebar}
         />
       )}
 
@@ -201,7 +380,7 @@ export default function DashboardLayout({
             </span>
           </Link>
           <button
-            onClick={() => setSidebarOpen(false)}
+            onClick={closeSidebar}
             className="lg:hidden ml-auto p-1.5 rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -212,71 +391,49 @@ export default function DashboardLayout({
         </div>
 
         <nav className="flex-1 px-3 py-2 overflow-y-auto">
-          <p className="px-3 pt-3 pb-2 text-[10.5px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-[0.08em]">
-            Main
-          </p>
+          {/* Home link */}
+          <div className="mb-1">
+            <Link
+              href={homeNav.href}
+              onClick={closeSidebar}
+              className={cn(
+                "flex items-center gap-3 px-3 py-[9px] rounded-lg text-[13px] font-medium transition-all duration-150 group",
+                isActive(homeNav.href)
+                  ? "bg-blue-600 text-white shadow-sm shadow-blue-600/20"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-700/50"
+              )}
+            >
+              <span className={cn("shrink-0 transition-colors", isActive(homeNav.href) ? "text-white" : "text-slate-400 dark:text-slate-500 group-hover:text-slate-500 dark:group-hover:text-slate-300")}>
+                {homeNav.icon}
+              </span>
+              {homeNav.label}
+            </Link>
+          </div>
+
+          <div className="my-3 mx-3 border-t border-slate-100 dark:border-slate-700/50" />
+
+          {/* Collapsible groups */}
           <div className="space-y-0.5">
-            {mainNav.map((item) => {
-              const active = isActive(item.href);
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setSidebarOpen(false)}
-                  className={cn(
-                    "flex items-center gap-3 px-3 py-[9px] rounded-lg text-[13px] font-medium transition-all duration-150 group",
-                    active
-                      ? "bg-blue-600 text-white shadow-sm shadow-blue-600/20"
-                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-700/50"
-                  )}
-                >
-                  <span className={cn("shrink-0 transition-colors", active ? "text-white" : "text-slate-400 dark:text-slate-500 group-hover:text-slate-500 dark:group-hover:text-slate-300")}>
-                    {item.icon}
-                  </span>
-                  {item.label}
-                </Link>
-              );
-            })}
+            {navGroups.map((group) => (
+              <CollapsibleGroup
+                key={group.label}
+                group={group}
+                pathname={pathname}
+                onLinkClick={closeSidebar}
+              />
+            ))}
           </div>
 
           {userTier === "ADMIN" && (
             <>
-              <div className="my-4 mx-3 border-t border-slate-100 dark:border-slate-700/50" />
-
-              <p className="px-3 pt-1 pb-2 text-[10.5px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-[0.08em]">
-                Admin
-              </p>
-              <div className="space-y-0.5">
-                {adminNav.map((item) => {
-                  const active = isActive(item.href);
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      onClick={() => setSidebarOpen(false)}
-                      className={cn(
-                        "flex items-center gap-3 px-3 py-[9px] rounded-lg text-[13px] font-medium transition-all duration-150 group",
-                        active
-                          ? "bg-blue-600 text-white shadow-sm shadow-blue-600/20"
-                          : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-700/50"
-                      )}
-                    >
-                      <span className={cn("shrink-0 transition-colors", active ? "text-white" : "text-slate-400 dark:text-slate-500 group-hover:text-slate-500 dark:group-hover:text-slate-300")}>
-                        {item.icon}
-                      </span>
-                      {item.label}
-                    </Link>
-                  );
-                })}
-              </div>
+              <div className="my-3 mx-3 border-t border-slate-100 dark:border-slate-700/50" />
+              <CollapsibleGroup group={adminGroup} pathname={pathname} onLinkClick={closeSidebar} />
             </>
           )}
 
-          <div className="my-4 mx-3 border-t border-slate-100 dark:border-slate-700/50" />
+          <div className="my-3 mx-3 border-t border-slate-100 dark:border-slate-700/50" />
 
-          <p className="px-3 pt-1 pb-2 text-[10.5px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-[0.08em]">
-            Account
-          </p>
+          {/* Bottom nav items */}
           <div className="space-y-0.5">
             {bottomNav.map((item) => {
               const active = isActive(item.href);
@@ -284,7 +441,7 @@ export default function DashboardLayout({
                 <Link
                   key={item.href}
                   href={item.href}
-                  onClick={() => setSidebarOpen(false)}
+                  onClick={closeSidebar}
                   className={cn(
                     "flex items-center gap-3 px-3 py-[9px] rounded-lg text-[13px] font-medium transition-all duration-150 group",
                     active
@@ -296,7 +453,7 @@ export default function DashboardLayout({
                     {item.icon}
                   </span>
                   {item.label}
-                  {"badge" in item && item.badge && (
+                  {item.badge && (
                     <span className={cn(
                       "ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded",
                       active ? "bg-white/20 text-white" : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
@@ -322,7 +479,8 @@ export default function DashboardLayout({
           </div>
         </nav>
 
-        <div className="p-3 border-t border-slate-100 dark:border-slate-700/50 shrink-0">
+        <div className="p-3 border-t border-slate-100 dark:border-slate-700/50 shrink-0 space-y-2">
+          <DarkModeToggle />
           <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors cursor-default">
             <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-[13px] font-bold text-white shrink-0 ring-2 ring-white dark:ring-slate-800 shadow-sm">
               {initials}
@@ -374,32 +532,38 @@ export default function DashboardLayout({
             <div className="flex-1 md:hidden" />
 
             <div className="flex items-center gap-1">
-              <button className="p-2 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="10" />
-                  <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
-                  <path d="M12 17h.01" />
-                </svg>
-              </button>
-
               <button className="relative p-2 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
                   <path d="M13.73 21a2 2 0 0 1-3.46 0" />
                 </svg>
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white" />
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white dark:ring-[#111827]" />
               </button>
 
               <div className="hidden md:block w-px h-6 bg-slate-200 dark:bg-slate-700 mx-2" />
 
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-xs font-bold text-white ring-2 ring-white shadow-sm cursor-pointer lg:hidden">
+              <Link href="/dashboard/settings" className="hidden md:flex items-center gap-3 px-2 py-1.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors cursor-pointer">
+                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-xs font-bold text-white ring-2 ring-white dark:ring-slate-800 shadow-sm">
+                  {initials}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[13px] font-semibold text-slate-900 dark:text-white truncate leading-tight">
+                    {userEmail?.split("@")[0] || "User"}
+                  </p>
+                  <p className="text-[11px] text-slate-400 dark:text-slate-500 leading-tight">
+                    {userTier === "PREMIUM" || userTier === "ADMIN" ? "Premium" : "Free plan"}
+                  </p>
+                </div>
+              </Link>
+
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-xs font-bold text-white ring-2 ring-white shadow-sm cursor-pointer md:hidden">
                 {initials}
               </div>
             </div>
           </div>
         </header>
 
-        <main className="p-4 lg:p-6 max-w-[1400px]">
+        <main className="p-4 lg:p-6 min-h-[calc(100vh-60px)]">
           {children}
         </main>
       </div>
