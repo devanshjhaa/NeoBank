@@ -9,7 +9,36 @@ class ApiError extends Error {
   }
 }
 
-async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+let isRefreshing = false;
+let refreshPromise: Promise<boolean> | null = null;
+
+async function tryRefreshToken(): Promise<boolean> {
+  const refreshToken = typeof window !== "undefined" ? localStorage.getItem("refreshToken") : null;
+  if (!refreshToken) return false;
+
+  try {
+    const res = await fetch(`${API_BASE}/auth/refresh`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refreshToken }),
+    });
+
+    if (!res.ok) {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      return false;
+    }
+
+    const data = await res.json();
+    localStorage.setItem("accessToken", data.accessToken);
+    localStorage.setItem("refreshToken", data.refreshToken);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function request<T>(endpoint: string, options: RequestInit = {}, isRetry = false): Promise<T> {
   const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
 
   const headers: HeadersInit = {
@@ -19,6 +48,28 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
   };
 
   const res = await fetch(`${API_BASE}${endpoint}`, { ...options, headers });
+
+  if (res.status === 401 && !isRetry && !endpoint.startsWith("/auth/")) {
+    if (!isRefreshing) {
+      isRefreshing = true;
+      refreshPromise = tryRefreshToken().finally(() => {
+        isRefreshing = false;
+        refreshPromise = null;
+      });
+    }
+
+    const refreshed = await (refreshPromise || tryRefreshToken());
+    if (refreshed) {
+      return request<T>(endpoint, options, true);
+    }
+
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("userEmail");
+      window.location.href = "/login";
+    }
+  }
 
   if (res.status === 204 || res.headers.get("content-length") === "0") {
     return {} as T;
@@ -40,6 +91,7 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
 
 export interface AuthResponse {
   accessToken: string;
+  refreshToken: string;
   newUser?: boolean;
 }
 
@@ -155,6 +207,18 @@ export const authApi = {
 
   googleAuth: (data: { idToken: string }) =>
     request<AuthResponse>("/auth/google", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
+  refresh: (data: { refreshToken: string }) =>
+    request<AuthResponse>("/auth/refresh", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
+  logout: (data: { refreshToken: string }) =>
+    request<void>("/auth/logout", {
       method: "POST",
       body: JSON.stringify(data),
     }),

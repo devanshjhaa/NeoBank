@@ -1,5 +1,6 @@
 package com.neobank.premium.service;
 
+import com.neobank.common.exception.ApiException;
 import com.neobank.user.entity.User;
 import com.neobank.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -18,10 +19,11 @@ public class PremiumService {
     public void upgradeToPremium(Long userId) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow();
+                .orElseThrow(() -> ApiException.notFound("User not found"));
 
         if (!user.isActive()) {
-            throw new RuntimeException("User not active");
+            throw ApiException.badRequest("ACCOUNT_SUSPENDED",
+                    "Your account is suspended and cannot be upgraded");
         }
 
         if ("PREMIUM".equals(user.getTier())) {

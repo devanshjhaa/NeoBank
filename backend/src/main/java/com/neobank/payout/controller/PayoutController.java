@@ -6,11 +6,13 @@ import com.neobank.payout.dto.PayoutResponse;
 import com.neobank.payout.entity.Payout;
 import com.neobank.payout.service.PayoutService;
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/payout")
+@PreAuthorize("hasRole('USER')")
 public class PayoutController {
 
     private final PayoutService payoutService;

@@ -1,5 +1,7 @@
 package com.neobank.auth.security;
 
+import com.neobank.user.entity.User;
+import com.neobank.user.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,9 +15,15 @@ import java.io.IOException;
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
+    private final RefreshTokenService refreshTokenService;
+    private final UserRepository userRepository;
 
-    public JwtAuthFilter(JwtProvider jwtProvider) {
+    public JwtAuthFilter(JwtProvider jwtProvider,
+                         RefreshTokenService refreshTokenService,
+                         UserRepository userRepository) {
         this.jwtProvider = jwtProvider;
+        this.refreshTokenService = refreshTokenService;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -30,24 +38,27 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
             String token = header.substring(7);
 
-            if (jwtProvider.isValid(token)) {
+            if (jwtProvider.isValid(token) && !refreshTokenService.isAccessTokenBlacklisted(token)) {
 
                 Long userId = jwtProvider.getUserId(token);
-                String email = jwtProvider.getEmail(token);
-                String tier = jwtProvider.getTier(token);
 
-                AuthPrincipal principal =
-                        new AuthPrincipal(userId, email, tier);
+                User user = userRepository.findById(userId).orElse(null);
+                if (user != null && user.isActive()) {
 
-                UsernamePasswordAuthenticationToken auth =
-                        new UsernamePasswordAuthenticationToken(
-                                principal,
-                                null,
-                                principal.getAuthorities()
-                        );
+                    String email = jwtProvider.getEmail(token);
+                    String tier = user.getTier();
 
-                SecurityContextHolder.getContext()
-                        .setAuthentication(auth);
+                    AuthPrincipal principal = new AuthPrincipal(userId, email, tier);
+
+                    UsernamePasswordAuthenticationToken auth =
+                            new UsernamePasswordAuthenticationToken(
+                                    principal,
+                                    null,
+                                    principal.getAuthorities()
+                            );
+
+                    SecurityContextHolder.getContext().setAuthentication(auth);
+                }
             }
         }
 

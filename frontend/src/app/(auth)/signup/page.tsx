@@ -43,6 +43,7 @@ export default function SignupPage() {
       const response = await authApi.googleAuth({ idToken });
       if (response.newUser) {
         localStorage.setItem("accessToken", response.accessToken);
+        localStorage.setItem("refreshToken", response.refreshToken);
         const payload = JSON.parse(atob(response.accessToken.split(".")[1]));
         localStorage.setItem("pendingEmail", payload.email || "");
         toast.success("Account created!", {
@@ -51,6 +52,7 @@ export default function SignupPage() {
         router.push("/verify-otp");
       } else {
         localStorage.setItem("accessToken", response.accessToken);
+        localStorage.setItem("refreshToken", response.refreshToken);
         toast.success("Welcome to NeoBank!");
         router.push("/dashboard");
       }

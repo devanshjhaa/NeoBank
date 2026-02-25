@@ -7,6 +7,7 @@ import com.neobank.bankaccount.entity.BankAccount;
 import com.neobank.bankaccount.service.BankAccountService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/bank-accounts")
+@PreAuthorize("hasRole('USER')")
 public class BankAccountController {
 
     private final BankAccountService bankAccountService;

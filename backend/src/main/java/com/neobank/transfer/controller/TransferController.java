@@ -6,11 +6,13 @@ import com.neobank.transfer.dto.TransferResponse;
 import com.neobank.transfer.entity.Transaction;
 import com.neobank.transfer.service.TransferService;
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/transfer")
+@PreAuthorize("hasRole('USER')")
 public class TransferController {
 
     private final TransferService transferService;

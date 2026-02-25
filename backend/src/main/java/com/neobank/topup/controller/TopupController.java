@@ -6,11 +6,13 @@ import com.neobank.topup.dto.TopupResponse;
 import com.neobank.topup.entity.Topup;
 import com.neobank.topup.service.TopupService;
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/topup")
+@PreAuthorize("hasRole('USER')")
 public class TopupController {
 
     private final TopupService topupService;

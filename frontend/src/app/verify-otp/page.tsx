@@ -79,6 +79,7 @@ export default function VerifyOtpPage() {
     try {
       const res = await authApi.verifyOtp({ email, phone, otp: code });
       localStorage.setItem("accessToken", res.accessToken);
+      localStorage.setItem("refreshToken", res.refreshToken);
       localStorage.removeItem("pendingEmail");
       toast.success("Account verified!");
       router.push("/dashboard");

@@ -69,4 +69,15 @@ public class JwtProvider {
             return false;
         }
     }
+
+    public long getRemainingTtlSeconds(String token) {
+        try {
+            Claims claims = parse(token);
+            long expiryEpoch = claims.getExpiration().getTime() / 1000;
+            long now = java.time.Instant.now().getEpochSecond();
+            return Math.max(0, expiryEpoch - now);
+        } catch (Exception ex) {
+            return 0;
+        }
+    }
 }

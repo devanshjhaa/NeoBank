@@ -37,6 +37,10 @@ public class ApiException extends RuntimeException {
         return new ApiException(HttpStatus.FORBIDDEN, "FORBIDDEN", message);
     }
 
+    public static ApiException unauthorized(String code, String message) {
+        return new ApiException(HttpStatus.UNAUTHORIZED, code, message);
+    }
+
     public static ApiException locked(String message) {
         return new ApiException(HttpStatus.LOCKED, "RESOURCE_LOCKED", message);
     }

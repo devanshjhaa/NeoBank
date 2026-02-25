@@ -17,6 +17,7 @@ import java.util.List;
 public class OutboxPublisherJob {
 
     private static final Logger log = LoggerFactory.getLogger(OutboxPublisherJob.class);
+    private static final int MAX_RETRIES = 5;
 
     private final EntityManager em;
     private final NotificationService notificationService;
@@ -35,12 +36,14 @@ public class OutboxPublisherJob {
     public void publish() {
 
         Query q = em.createNativeQuery("""
-                    SELECT id, event_type, payload::text
+                    SELECT id, event_type, payload::text, retry_count
                     FROM outbox_events
                     WHERE published = false
+                      AND retry_count < :maxRetries
                     ORDER BY id
                     LIMIT 50
                 """);
+        q.setParameter("maxRetries", MAX_RETRIES);
 
         @SuppressWarnings("unchecked")
         List<Object[]> events = q.getResultList();
@@ -64,6 +67,14 @@ public class OutboxPublisherJob {
 
             } catch (Exception ex) {
                 log.error("OUTBOX_DISPATCH_FAILED id={} type={}", id, type, ex);
+
+                em.createNativeQuery("""
+                            UPDATE outbox_events
+                            SET retry_count = retry_count + 1
+                            WHERE id = :id
+                        """)
+                        .setParameter("id", id)
+                        .executeUpdate();
             }
         }
     }

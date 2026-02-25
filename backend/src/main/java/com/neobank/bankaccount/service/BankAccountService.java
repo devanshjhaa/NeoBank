@@ -2,6 +2,7 @@ package com.neobank.bankaccount.service;
 
 import com.neobank.bankaccount.entity.BankAccount;
 import com.neobank.bankaccount.repository.BankAccountRepository;
+import com.neobank.common.exception.ApiException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,12 +22,12 @@ public class BankAccountService {
         boolean exists = bankAccountRepository
                 .existsByUserIdAndAccountNumberAndIfscCode(userId, accountNumber, ifscCode.toUpperCase());
         if (exists) {
-            throw new IllegalStateException("This bank account is already linked");
+            throw ApiException.conflict("ACCOUNT_ALREADY_LINKED",
+                    "This bank account is already linked to your profile");
         }
 
         BankAccount account = BankAccount.create(userId, accountNumber, ifscCode, holderName);
 
-        // Sandbox auto-verification: in test mode all accounts are auto-verified
         account.markVerified();
 
         return bankAccountRepository.save(account);
@@ -40,13 +41,15 @@ public class BankAccountService {
     @Transactional(readOnly = true)
     public BankAccount getUserAccount(Long userId, Long accountId) {
         return bankAccountRepository.findByIdAndUserId(accountId, userId)
-                .orElseThrow(() -> new IllegalArgumentException("Bank account not found"));
+                .orElseThrow(() -> ApiException.notFound(
+                        "Bank account not found or does not belong to you"));
     }
 
     @Transactional
     public void deleteAccount(Long userId, Long accountId) {
         BankAccount account = bankAccountRepository.findByIdAndUserId(accountId, userId)
-                .orElseThrow(() -> new IllegalArgumentException("Bank account not found"));
+                .orElseThrow(() -> ApiException.notFound(
+                        "Bank account not found or does not belong to you"));
         bankAccountRepository.delete(account);
     }
 }

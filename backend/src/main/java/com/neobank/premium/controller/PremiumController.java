@@ -2,6 +2,7 @@ package com.neobank.premium.controller;
 
 import com.neobank.auth.security.AuthPrincipal;
 import com.neobank.premium.service.PremiumService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +17,7 @@ public class PremiumController {
     }
 
     @PostMapping("/upgrade")
+    @PreAuthorize("hasRole('USER')")
     public void upgrade(
             @AuthenticationPrincipal AuthPrincipal principal
     ) {

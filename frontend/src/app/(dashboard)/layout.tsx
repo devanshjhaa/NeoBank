@@ -6,7 +6,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 import { LogoIcon } from "@/components/logo";
-import { userApi } from "@/lib/api";
+import { userApi, authApi } from "@/lib/api";
 
 interface NavItem {
   label: string;
@@ -329,10 +329,20 @@ export default function DashboardLayout({
       .catch(() => {});
   }, [router]);
 
-  const handleLogout = useCallback(() => {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("userEmail");
-    router.push("/login");
+  const handleLogout = useCallback(async () => {
+    try {
+      const refreshToken = localStorage.getItem("refreshToken");
+      if (refreshToken) {
+        await authApi.logout({ refreshToken });
+      }
+    } catch {
+      // ignore
+    } finally {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("userEmail");
+      router.push("/login");
+    }
   }, [router]);
 
   if (!ready) {

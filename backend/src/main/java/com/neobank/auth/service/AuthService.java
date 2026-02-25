@@ -2,6 +2,7 @@ package com.neobank.auth.service;
 
 import com.neobank.auth.otp.OtpService;
 import com.neobank.auth.security.JwtProvider;
+import com.neobank.auth.security.RefreshTokenService;
 import com.neobank.common.exception.ApiException;
 import com.neobank.user.entity.User;
 import com.neobank.user.repository.UserRepository;
@@ -22,19 +23,24 @@ public class AuthService {
     private final OtpService otpService;
     private final JwtProvider jwtProvider;
     private final GoogleTokenVerifier googleTokenVerifier;
+    private final RefreshTokenService refreshTokenService;
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
     public AuthService(UserRepository userRepository,
             WalletService walletService,
             OtpService otpService,
             JwtProvider jwtProvider,
-            GoogleTokenVerifier googleTokenVerifier) {
+            GoogleTokenVerifier googleTokenVerifier,
+            RefreshTokenService refreshTokenService) {
         this.userRepository = userRepository;
         this.walletService = walletService;
         this.otpService = otpService;
         this.jwtProvider = jwtProvider;
         this.googleTokenVerifier = googleTokenVerifier;
+        this.refreshTokenService = refreshTokenService;
     }
+
+    public record TokenPair(String accessToken, String refreshToken) {}
 
     @Transactional
     public void signup(String email, String password) {
@@ -48,7 +54,7 @@ public class AuthService {
         log.info("User signed up email={}", email);
     }
 
-    public String login(String email, String password) {
+    public TokenPair login(String email, String password) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> ApiException.badRequest("INVALID_CREDENTIALS", "Invalid email or password"));
 
@@ -56,9 +62,15 @@ public class AuthService {
             throw ApiException.badRequest("INVALID_CREDENTIALS", "Invalid email or password");
         }
 
+        if (!user.isActive()) {
+            throw ApiException.forbidden("Account is suspended");
+        }
+
         log.info("User login email={}", email);
 
-        return jwtProvider.createToken(user.getId(), user.getEmail(), user.getTier());
+        String accessToken = jwtProvider.createToken(user.getId(), user.getEmail(), user.getTier());
+        String refreshToken = refreshTokenService.createRefreshToken(user.getId());
+        return new TokenPair(accessToken, refreshToken);
     }
 
     public void requestOtp(String email, String phone) {
@@ -75,7 +87,7 @@ public class AuthService {
     }
 
     @Transactional
-    public String verifyOtp(String email, String phone, String otp) {
+    public TokenPair verifyOtp(String email, String phone, String otp) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> ApiException.notFound("User not found"));
 
@@ -91,10 +103,12 @@ public class AuthService {
 
         log.info("User verified email={}", email);
 
-        return jwtProvider.createToken(user.getId(), user.getEmail(), user.getTier());
+        String accessToken = jwtProvider.createToken(user.getId(), user.getEmail(), user.getTier());
+        String refreshToken = refreshTokenService.createRefreshToken(user.getId());
+        return new TokenPair(accessToken, refreshToken);
     }
 
-    public record GoogleLoginResult(String token, boolean newUser) {}
+    public record GoogleLoginResult(String accessToken, String refreshToken, boolean newUser) {}
 
     @Transactional
     public GoogleLoginResult loginWithGoogle(String idToken) {
@@ -119,7 +133,38 @@ public class AuthService {
 
         log.info("Google login email={} newUser={}", googleUser.email(), needsPhoneVerification);
 
-        String token = jwtProvider.createToken(user.getId(), user.getEmail(), user.getTier());
-        return new GoogleLoginResult(token, needsPhoneVerification);
+        String accessToken = jwtProvider.createToken(user.getId(), user.getEmail(), user.getTier());
+        String refreshToken = refreshTokenService.createRefreshToken(user.getId());
+        return new GoogleLoginResult(accessToken, refreshToken, needsPhoneVerification);
+    }
+
+    public TokenPair refresh(String refreshToken) {
+        Long userId = refreshTokenService.validateAndGetUserId(refreshToken);
+        if (userId == null) {
+            throw ApiException.unauthorized("INVALID_REFRESH_TOKEN", "Refresh token is invalid or expired");
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> ApiException.unauthorized("USER_NOT_FOUND", "User not found"));
+
+        if (!user.isActive()) {
+            refreshTokenService.revokeRefreshToken(refreshToken);
+            throw ApiException.forbidden("Account is suspended");
+        }
+
+        String newAccessToken = jwtProvider.createToken(user.getId(), user.getEmail(), user.getTier());
+        String newRefreshToken = refreshTokenService.rotateRefreshToken(refreshToken, userId);
+
+        return new TokenPair(newAccessToken, newRefreshToken);
+    }
+
+    public void logout(String accessToken, String refreshToken) {
+        if (accessToken != null && jwtProvider.isValid(accessToken)) {
+            long remainingTtl = jwtProvider.getRemainingTtlSeconds(accessToken);
+            refreshTokenService.blacklistAccessToken(accessToken, remainingTtl);
+        }
+        if (refreshToken != null) {
+            refreshTokenService.revokeRefreshToken(refreshToken);
+        }
     }
 }

@@ -31,6 +31,7 @@ export default function LoginPage() {
       const response = await authApi.googleAuth({ idToken });
       if (response.newUser) {
         localStorage.setItem("accessToken", response.accessToken);
+        localStorage.setItem("refreshToken", response.refreshToken);
         const payload = JSON.parse(atob(response.accessToken.split(".")[1]));
         localStorage.setItem("pendingEmail", payload.email || "");
         toast.success("Almost there!", {
@@ -39,6 +40,7 @@ export default function LoginPage() {
         router.push("/verify-otp");
       } else {
         localStorage.setItem("accessToken", response.accessToken);
+        localStorage.setItem("refreshToken", response.refreshToken);
         toast.success("Welcome back!");
         router.push("/dashboard");
       }
@@ -67,6 +69,7 @@ export default function LoginPage() {
     try {
       const response = await authApi.login(data);
       localStorage.setItem("accessToken", response.accessToken);
+      localStorage.setItem("refreshToken", response.refreshToken);
       toast.success("Welcome back!");
       router.push("/dashboard");
     } catch (error: unknown) {

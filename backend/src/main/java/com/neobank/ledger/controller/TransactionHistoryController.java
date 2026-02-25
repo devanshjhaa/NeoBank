@@ -6,6 +6,7 @@ import com.neobank.ledger.entity.LedgerEntry;
 import com.neobank.ledger.repository.LedgerRepository;
 import com.neobank.wallet.entity.Wallet;
 import com.neobank.wallet.service.WalletService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/transactions")
+@PreAuthorize("hasRole('USER')")
 public class TransactionHistoryController {
 
     private final LedgerRepository ledgerRepository;
