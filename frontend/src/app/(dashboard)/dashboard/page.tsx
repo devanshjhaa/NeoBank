@@ -234,7 +234,8 @@ export default function DashboardPage() {
     );
   }
 
-  const displayName = profile?.email?.split("@")[0] || "there";
+  const displayName = profile?.fullName || profile?.email?.split("@")[0] || "there";
+  const avatarEmoji = profile?.avatarEmoji || "🧑‍💼";
   const cardBalance = formatCurrency(wallet?.balance || 0, wallet?.currency || "INR");
 
   return (
@@ -248,8 +249,8 @@ export default function DashboardPage() {
         <div>
           <h1 className="text-[28px] lg:text-[32px] font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
             Welcome, {displayName}{" "}
-            <span className="inline-block animate-bounce" role="img" aria-label="fire">
-              &#128293;
+            <span className="inline-block animate-bounce" role="img" aria-label="avatar">
+              {avatarEmoji}
             </span>
           </h1>
           <p className="text-sm text-slate-400 dark:text-slate-500 mt-1 font-medium">
@@ -833,6 +834,7 @@ export default function DashboardPage() {
                         name: string;
                         initial: string;
                         color: string;
+                        receiverId: string | null;
                       }[] = [];
                       const colors = [
                         "from-emerald-500 to-teal-600",
@@ -844,16 +846,18 @@ export default function DashboardPage() {
                       const seen = new Set<string>();
                       for (const txn of recentTxns) {
                         if (txn.txnType === "P2P" && txn.description) {
-                          const name = txn.description
-                            .replace(/^(Sent to|Received from)\s*/i, "")
-                            .trim();
-                          if (name && !seen.has(name)) {
-                            seen.add(name);
-                            transferContacts.push({
-                              name,
-                              initial: name[0]?.toUpperCase() || "?",
-                              color: colors[transferContacts.length % colors.length],
-                            });
+                          const idMatch = txn.description.match(/^Sent to #(\d+)$/i);
+                          if (idMatch) {
+                            const uid = idMatch[1];
+                            if (!seen.has(uid)) {
+                              seen.add(uid);
+                              transferContacts.push({
+                                name: `User #${uid}`,
+                                initial: uid[0] || "?",
+                                color: colors[transferContacts.length % colors.length],
+                                receiverId: uid,
+                              });
+                            }
                           }
                         }
                       }
@@ -865,12 +869,13 @@ export default function DashboardPage() {
                             name,
                             initial: name[0]?.toUpperCase() || "B",
                             color: colors[transferContacts.length % colors.length],
+                            receiverId: null,
                           });
                         }
                       }
                       return transferContacts.slice(0, 5).map((c, i) => (
                         <Link
-                          href="/dashboard/transfer"
+                          href={c.receiverId ? `/dashboard/transfer?receiverId=${c.receiverId}` : "/dashboard/transfer"}
                           key={i}
                           className="flex flex-col items-center gap-2 shrink-0 group"
                         >

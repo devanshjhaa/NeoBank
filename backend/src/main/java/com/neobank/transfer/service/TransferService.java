@@ -70,9 +70,9 @@ public class TransferService {
             String ref = UUID.randomUUID().toString();
 
             ledgerService.record(
-                    LedgerEntry.debit(senderWalletId, amount, "P2P", ref, "Transfer out"));
+                    LedgerEntry.debit(senderWalletId, amount, "P2P", ref, "Sent to #" + receiverId));
             ledgerService.record(
-                    LedgerEntry.credit(receiverWalletId, amount, "P2P", ref, "Transfer in"));
+                    LedgerEntry.credit(receiverWalletId, amount, "P2P", ref, "Received from #" + senderId));
 
             tx.markSuccess();
 

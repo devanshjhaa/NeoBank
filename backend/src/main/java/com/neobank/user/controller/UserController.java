@@ -32,6 +32,9 @@ public class UserController {
                 user.getStatus(),
                 user.getTier(),
                 user.getAuthProvider(),
+                user.getFullName(),
+                user.getDateOfBirth(),
+                user.getAvatarEmoji(),
                 user.getCreatedAt()
         );
     }

@@ -13,6 +13,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+
 @Service
 public class AuthService {
 
@@ -87,7 +90,8 @@ public class AuthService {
     }
 
     @Transactional
-    public TokenPair verifyOtp(String email, String phone, String otp) {
+    public TokenPair verifyOtp(String email, String phone, String otp,
+                               String fullName, String dateOfBirthStr) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> ApiException.notFound("User not found"));
 
@@ -96,7 +100,18 @@ public class AuthService {
             throw ApiException.badRequest("INVALID_OTP", "Invalid or expired OTP");
         }
 
-        user.verifyPhone(phone);
+        LocalDate dob = null;
+        if (dateOfBirthStr != null && !dateOfBirthStr.isBlank()) {
+            try {
+                dob = LocalDate.parse(dateOfBirthStr);
+                if (dob.plusYears(18).isAfter(LocalDate.now())) {
+                    throw ApiException.badRequest("UNDERAGE", "You must be at least 18 years old");
+                }
+            } catch (DateTimeParseException ignored) {
+            }
+        }
+
+        user.verifyPhone(phone, fullName, dob);
         userRepository.save(user);
 
         walletService.createWalletIfAbsent(user.getId());

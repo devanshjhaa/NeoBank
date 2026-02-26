@@ -1,0 +1,3 @@
+ALTER TABLE users ADD COLUMN full_name VARCHAR(100);
+ALTER TABLE users ADD COLUMN date_of_birth DATE;
+ALTER TABLE users ADD COLUMN avatar_emoji VARCHAR(10);

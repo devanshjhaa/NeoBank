@@ -18,6 +18,11 @@ export default function VerifyOtpPage() {
   const { setTheme } = useTheme();
 
   const [email, setEmail] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState("");
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  const [calendarYear, setCalendarYear] = useState(new Date().getFullYear() - 18);
+  const [calendarMonth, setCalendarMonth] = useState(new Date().getMonth());
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(""));
   const [step, setStep] = useState<"phone" | "otp">("phone");
@@ -25,6 +30,7 @@ export default function VerifyOtpPage() {
   const [cooldown, setCooldown] = useState(0);
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const calendarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setTheme("light");
@@ -45,7 +51,50 @@ export default function VerifyOtpPage() {
     return () => clearInterval(id);
   }, [cooldown]);
 
+  useEffect(() => {
+    if (!calendarOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (calendarRef.current && !calendarRef.current.contains(e.target as Node)) {
+        setCalendarOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [calendarOpen]);
+
+  const daysInMonth = (y: number, m: number) => new Date(y, m + 1, 0).getDate();
+  const firstDayOfMonth = (y: number, m: number) => new Date(y, m, 1).getDay();
+
+  const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+  const handleDateSelect = (day: number) => {
+    const m = String(calendarMonth + 1).padStart(2, "0");
+    const d = String(day).padStart(2, "0");
+    setDateOfBirth(`${calendarYear}-${m}-${d}`);
+    setCalendarOpen(false);
+  };
+
+  const formatDisplayDate = (iso: string) => {
+    if (!iso) return "";
+    const dt = new Date(iso + "T00:00:00");
+    return dt.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
+  };
+
+  const minAge = 18;
+  const maxDateForAge = new Date(new Date().getFullYear() - minAge, new Date().getMonth(), new Date().getDate());
+
   const handleRequestOtp = async () => {
+    if (!fullName || fullName.trim().length < 2) {
+      toast.error("Enter your full name");
+      return;
+    }
+    if (dateOfBirth) {
+      const dob = new Date(dateOfBirth + "T00:00:00");
+      if (dob > maxDateForAge) {
+        toast.error("You must be at least 18 years old");
+        return;
+      }
+    }
     if (!phone || phone.length < 10) {
       toast.error("Enter a valid 10-digit phone number");
       return;
@@ -77,7 +126,13 @@ export default function VerifyOtpPage() {
     }
     setIsLoading(true);
     try {
-      const res = await authApi.verifyOtp({ email, phone, otp: code });
+      const res = await authApi.verifyOtp({
+        email,
+        phone,
+        otp: code,
+        fullName: fullName.trim() || undefined,
+        dateOfBirth: dateOfBirth || undefined,
+      });
       localStorage.setItem("accessToken", res.accessToken);
       localStorage.setItem("refreshToken", res.refreshToken);
       localStorage.removeItem("pendingEmail");
@@ -167,7 +222,7 @@ export default function VerifyOtpPage() {
               Your Wallet
             </h2>
             <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2">
-              {["Link Phone", "Verify Email", "Start Banking"].map((pill) => (
+              {["Complete Profile", "Verify Identity", "Start Banking"].map((pill) => (
                 <span
                   key={pill}
                   className="inline-flex items-center gap-2 text-[13px] font-medium text-white/90"
@@ -213,7 +268,7 @@ export default function VerifyOtpPage() {
               ) : (
                 <div className="h-6 w-6 rounded-full bg-blue-600 text-white grid place-items-center text-xs font-bold">2</div>
               )}
-              <span className={`text-xs font-medium ${step === "otp" ? "text-emerald-600" : "text-blue-600"}`}>Phone</span>
+              <span className={`text-xs font-medium ${step === "otp" ? "text-emerald-600" : "text-blue-600"}`}>Profile</span>
             </div>
             <div className="h-px w-6 bg-slate-200" />
             <div className="flex items-center gap-1.5">
@@ -226,12 +281,117 @@ export default function VerifyOtpPage() {
 
           {step === "phone" ? (
             <div>
-              <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Link your phone number</h1>
+              <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Complete your profile</h1>
               <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-                This number will be linked to your wallet for transactions and payouts.
+                Tell us a bit about yourself and link your phone number.
               </p>
 
               <div className="mt-6 space-y-5">
+                <div className="space-y-1.5">
+                  <Label htmlFor="fullName" className="text-sm font-medium text-slate-700 dark:text-slate-300">Full name</Label>
+                  <Input
+                    id="fullName"
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="e.g. Devansh Jha"
+                    autoComplete="name"
+                    disabled={isLoading}
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="dob" className="text-sm font-medium text-slate-700 dark:text-slate-300">Date of birth</Label>
+                  <div className="relative" ref={calendarRef}>
+                    <button
+                      type="button"
+                      onClick={() => setCalendarOpen(!calendarOpen)}
+                      className="w-full h-10 px-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-left text-sm flex items-center justify-between hover:border-slate-400 dark:hover:border-slate-500 transition-colors"
+                    >
+                      <span className={dateOfBirth ? "text-slate-900 dark:text-white" : "text-slate-400 dark:text-slate-500"}>
+                        {dateOfBirth ? formatDisplayDate(dateOfBirth) : "Select your date of birth"}
+                      </span>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400 shrink-0">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                        <line x1="16" y1="2" x2="16" y2="6" />
+                        <line x1="8" y1="2" x2="8" y2="6" />
+                        <line x1="3" y1="10" x2="21" y2="10" />
+                      </svg>
+                    </button>
+                    {calendarOpen && (
+                      <div className="absolute z-50 mt-1 w-full bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-xl shadow-slate-200/50 dark:shadow-none p-4 animate-in fade-in slide-in-from-top-1 duration-200">
+                        <div className="flex items-center justify-between mb-4">
+                          <button
+                            type="button"
+                            onClick={() => { if (calendarMonth === 0) { setCalendarMonth(11); setCalendarYear(y => y - 1); } else setCalendarMonth(m => m - 1); }}
+                            className="w-8 h-8 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-center transition-colors"
+                          >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
+                          </button>
+                          <div className="flex items-center gap-2">
+                            <select
+                              value={calendarMonth}
+                              onChange={(e) => setCalendarMonth(Number(e.target.value))}
+                              className="text-sm font-semibold text-slate-900 dark:text-white bg-transparent border-none focus:outline-none cursor-pointer appearance-none pr-1"
+                            >
+                              {MONTHS.map((m, i) => <option key={m} value={i}>{m}</option>)}
+                            </select>
+                            <select
+                              value={calendarYear}
+                              onChange={(e) => setCalendarYear(Number(e.target.value))}
+                              className="text-sm font-semibold text-slate-900 dark:text-white bg-transparent border-none focus:outline-none cursor-pointer appearance-none"
+                            >
+                              {Array.from({ length: 80 }, (_, i) => new Date().getFullYear() - minAge - i).map(y => (
+                                <option key={y} value={y}>{y}</option>
+                              ))}
+                            </select>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => { if (calendarMonth === 11) { setCalendarMonth(0); setCalendarYear(y => y + 1); } else setCalendarMonth(m => m + 1); }}
+                            className="w-8 h-8 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-center transition-colors"
+                          >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+                          </button>
+                        </div>
+                        <div className="grid grid-cols-7 gap-0.5 text-center mb-2">
+                          {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map(d => (
+                            <div key={d} className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 py-1">{d}</div>
+                          ))}
+                        </div>
+                        <div className="grid grid-cols-7 gap-0.5 text-center">
+                          {Array.from({ length: firstDayOfMonth(calendarYear, calendarMonth) }).map((_, i) => (
+                            <div key={`e-${i}`} />
+                          ))}
+                          {Array.from({ length: daysInMonth(calendarYear, calendarMonth) }, (_, i) => i + 1).map(day => {
+                            const iso = `${calendarYear}-${String(calendarMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+                            const selected = dateOfBirth === iso;
+                            const dayDate = new Date(calendarYear, calendarMonth, day);
+                            const tooYoung = dayDate > maxDateForAge;
+                            return (
+                              <button
+                                key={day}
+                                type="button"
+                                onClick={() => !tooYoung && handleDateSelect(day)}
+                                disabled={tooYoung}
+                                className={`w-9 h-9 rounded-lg text-sm font-medium transition-all ${
+                                  tooYoung
+                                    ? "text-slate-300 dark:text-slate-600 cursor-not-allowed"
+                                    : selected
+                                      ? "bg-blue-600 text-white shadow-sm"
+                                      : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
+                                }`}
+                              >
+                                {day}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
                 <div className="space-y-1.5">
                   <Label htmlFor="phone" className="text-sm font-medium text-slate-700 dark:text-slate-300">Phone number</Label>
                   <div className="flex gap-2">
@@ -253,7 +413,7 @@ export default function VerifyOtpPage() {
 
                 <Button
                   onClick={handleRequestOtp}
-                  disabled={isLoading || phone.length < 10}
+                  disabled={isLoading || phone.length < 10 || fullName.trim().length < 2}
                   className="w-full h-11"
                 >
                   {isLoading ? (

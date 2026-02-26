@@ -82,4 +82,7 @@ jwt:
   access-ttl-seconds: 1800
 
 google:
-  client-id: ${GOOGLE_CLIENT_ID:no-client-id-set}
+  client-id: ${GOOGLE_CLIENT_ID:956973692879-hp17r070ofrnmt2t34ffla1b5vv150j4.apps.googleusercontent.com}
+
+webhook:
+  secret: ${WEBHOOK_SECRET:neobank-webhook-dev-secret-change-in-production}

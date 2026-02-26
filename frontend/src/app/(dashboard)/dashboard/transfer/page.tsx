@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -29,6 +29,7 @@ const quickAmounts = [100, 500, 1000, 2500, 5000];
 
 export default function TransferPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const [step, setStep] = useState<"form" | "confirm">("form");
   const [formData, setFormData] = useState<TransferFormData | null>(null);
@@ -50,6 +51,13 @@ export default function TransferPage() {
   useEffect(() => {
     walletApi.getMyWallet().then(setWallet).catch(() => {});
   }, []);
+
+  useEffect(() => {
+    const rid = searchParams.get("receiverId");
+    if (rid) {
+      setValue("receiverId", rid, { shouldValidate: true });
+    }
+  }, [searchParams, setValue]);
 
   const handleQuickAmount = (amt: number) => {
     setSelectedAmount(amt);
@@ -94,7 +102,7 @@ export default function TransferPage() {
 
   if (step === "confirm" && formData) {
     return (
-      <div className="space-y-6 max-w-2xl">
+      <div className="space-y-6">
         <div>
           <h1 className="text-[22px] font-bold text-slate-900 dark:text-white tracking-tight">Confirm Transfer</h1>
           <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-0.5">Please review the details before confirming</p>
@@ -190,7 +198,7 @@ export default function TransferPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-2xl">
+    <div className="space-y-6">
       <div>
         <h1 className="text-[22px] font-bold text-slate-900 dark:text-white tracking-tight">Send Money</h1>
         <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-0.5">Transfer money to another NeoBank user instantly</p>

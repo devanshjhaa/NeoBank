@@ -163,6 +163,9 @@ export interface UserProfileResponse {
   status: string;
   tier: string;
   authProvider: string;
+  fullName: string | null;
+  dateOfBirth: string | null;
+  avatarEmoji: string | null;
   createdAt: string;
 }
 
@@ -199,7 +202,7 @@ export const authApi = {
       body: JSON.stringify(data),
     }),
 
-  verifyOtp: (data: { email: string; phone: string; otp: string }) =>
+  verifyOtp: (data: { email: string; phone: string; otp: string; fullName?: string; dateOfBirth?: string }) =>
     request<AuthResponse>("/auth/verify-otp", {
       method: "POST",
       body: JSON.stringify(data),

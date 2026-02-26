@@ -297,7 +297,7 @@ export default function PayoutPage() {
 
   if (step === "confirm" && selectedAccount) {
     return (
-      <div className="space-y-6 max-w-2xl">
+      <div className="space-y-6">
         <div>
           <h1 className="text-[22px] font-bold text-slate-900 dark:text-white tracking-tight">Confirm Payout</h1>
           <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-0.5">Review the details before confirming</p>
@@ -391,7 +391,7 @@ export default function PayoutPage() {
 
   if (step === "amount" && selectedAccount) {
     return (
-      <div className="space-y-6 max-w-2xl">
+      <div className="space-y-6">
         <div>
           <h1 className="text-[22px] font-bold text-slate-900 dark:text-white tracking-tight">Payout</h1>
           <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-0.5">Withdraw funds to your bank account</p>
@@ -470,7 +470,7 @@ export default function PayoutPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-2xl">
+    <div className="space-y-6">
       <div>
         <h1 className="text-[22px] font-bold text-slate-900 dark:text-white tracking-tight">Payout</h1>
         <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-0.5">Withdraw funds to your bank account</p>

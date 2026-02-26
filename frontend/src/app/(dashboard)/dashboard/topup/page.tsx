@@ -119,7 +119,7 @@ export default function TopupPage() {
   );
 
   return (
-    <div className="space-y-6 max-w-2xl">
+    <div className="space-y-6">
       <div>
         <h1 className="text-[22px] font-bold text-slate-900 dark:text-white tracking-tight">Top Up Wallet</h1>
         <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-0.5">Add funds to your NeoBank wallet</p>

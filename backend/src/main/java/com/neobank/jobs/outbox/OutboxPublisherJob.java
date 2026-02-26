@@ -4,13 +4,15 @@ import com.neobank.notification.service.NotificationService;
 import com.neobank.user.entity.User;
 import com.neobank.user.repository.UserRepository;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.Query;
+import jakarta.persistence.PersistenceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -19,42 +21,53 @@ public class OutboxPublisherJob {
     private static final Logger log = LoggerFactory.getLogger(OutboxPublisherJob.class);
     private static final int MAX_RETRIES = 5;
 
-    private final EntityManager em;
+    @PersistenceContext
+    private EntityManager em;
+
     private final NotificationService notificationService;
     private final UserRepository userRepository;
+    private final TransactionTemplate tx;
 
-    public OutboxPublisherJob(EntityManager em,
-            NotificationService notificationService,
-            UserRepository userRepository) {
-        this.em = em;
+    public OutboxPublisherJob(NotificationService notificationService,
+            UserRepository userRepository,
+            PlatformTransactionManager txManager) {
         this.notificationService = notificationService;
         this.userRepository = userRepository;
+        this.tx = new TransactionTemplate(txManager);
     }
 
     @Scheduled(fixedDelay = 5000)
-    @Transactional
     public void publish() {
 
-        Query q = em.createNativeQuery("""
-                    SELECT id, event_type, payload::text, retry_count
-                    FROM outbox_events
-                    WHERE published = false
-                      AND retry_count < :maxRetries
-                    ORDER BY id
-                    LIMIT 50
-                """);
-        q.setParameter("maxRetries", MAX_RETRIES);
+        List<Object[]> events = tx.execute(status -> {
+            @SuppressWarnings("unchecked")
+            List<Object[]> rows = em.createNativeQuery("""
+                        SELECT id, event_type, payload::text
+                        FROM outbox_events
+                        WHERE published = false
+                          AND retry_count < :maxRetries
+                        ORDER BY id
+                        LIMIT 50
+                    """)
+                    .setParameter("maxRetries", MAX_RETRIES)
+                    .getResultList();
+            return new ArrayList<>(rows);
+        });
 
-        @SuppressWarnings("unchecked")
-        List<Object[]> events = q.getResultList();
+        if (events == null || events.isEmpty())
+            return;
 
         for (Object[] row : events) {
-
             Long id = ((Number) row[0]).longValue();
             String type = (String) row[1];
             String payload = (String) row[2];
+            processEvent(id, type, payload);
+        }
+    }
 
-            try {
+    private void processEvent(Long id, String type, String payload) {
+        try {
+            tx.executeWithoutResult(status -> {
                 dispatch(type, payload);
 
                 em.createNativeQuery("""
@@ -64,17 +77,20 @@ public class OutboxPublisherJob {
                         """)
                         .setParameter("id", id)
                         .executeUpdate();
+            });
+        } catch (Exception ex) {
+            log.error("OUTBOX_DISPATCH_FAILED id={} type={}", id, type, ex);
 
-            } catch (Exception ex) {
-                log.error("OUTBOX_DISPATCH_FAILED id={} type={}", id, type, ex);
-
-                em.createNativeQuery("""
+            try {
+                tx.executeWithoutResult(status -> em.createNativeQuery("""
                             UPDATE outbox_events
                             SET retry_count = retry_count + 1
                             WHERE id = :id
                         """)
                         .setParameter("id", id)
-                        .executeUpdate();
+                        .executeUpdate());
+            } catch (Exception e2) {
+                log.error("Failed to increment retry_count for event id={}", id, e2);
             }
         }
     }

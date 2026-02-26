@@ -34,7 +34,8 @@ public class AuthController {
 
     @PostMapping("/verify-otp")
     public AuthResponse verifyOtp(@Valid @RequestBody VerifyOtpRequest req) {
-        AuthService.TokenPair pair = authService.verifyOtp(req.email(), req.phone(), req.otp());
+        AuthService.TokenPair pair = authService.verifyOtp(
+                req.email(), req.phone(), req.otp(), req.fullName(), req.dateOfBirth());
         return new AuthResponse(pair.accessToken(), pair.refreshToken());
     }
 

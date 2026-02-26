@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect, useCallback } from "react";
 import { useTheme } from "next-themes";
+import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { LogoIcon } from "@/components/logo";
 import { userApi, authApi } from "@/lib/api";
@@ -175,7 +176,7 @@ const bottomNav: NavItem[] = [
   },
 ];
 
-function DarkModeToggle() {
+function DarkModeToggle({ collapsed = false }: { collapsed?: boolean }) {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -184,7 +185,11 @@ function DarkModeToggle() {
   return (
     <button
       onClick={() => setTheme(isDark ? "light" : "dark")}
-      className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-all"
+      title={collapsed ? (isDark ? "Light mode" : "Dark mode") : undefined}
+      className={cn(
+        "flex items-center rounded-lg text-[13px] font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-all",
+        collapsed ? "justify-center w-10 h-10 mx-auto" : "w-full gap-3 px-3 py-2"
+      )}
     >
       {isDark ? (
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400 shrink-0">
@@ -199,16 +204,18 @@ function DarkModeToggle() {
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
         </svg>
       )}
-      Dark Mode
-      <div className={cn(
-        "ml-auto w-9 h-5 rounded-full p-0.5 transition-colors",
-        isDark ? "bg-blue-600" : "bg-slate-200 dark:bg-slate-600"
-      )}>
+      {!collapsed && "Dark Mode"}
+      {!collapsed && (
         <div className={cn(
-          "w-4 h-4 rounded-full bg-white shadow-sm transition-transform",
-          isDark ? "translate-x-4" : "translate-x-0"
-        )} />
-      </div>
+          "ml-auto w-9 h-5 rounded-full p-0.5 transition-colors",
+          isDark ? "bg-blue-600" : "bg-slate-200 dark:bg-slate-600"
+        )}>
+          <div className={cn(
+            "w-4 h-4 rounded-full bg-white shadow-sm transition-transform",
+            isDark ? "translate-x-4" : "translate-x-0"
+          )} />
+        </div>
+      )}
     </button>
   );
 }
@@ -217,10 +224,12 @@ function CollapsibleGroup({
   group,
   pathname,
   onLinkClick,
+  collapsed,
 }: {
   group: NavGroup;
   pathname: string;
   onLinkClick: () => void;
+  collapsed: boolean;
 }) {
   const hasActiveChild = group.items.some((i) =>
     i.href === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(i.href)
@@ -230,6 +239,34 @@ function CollapsibleGroup({
   useEffect(() => {
     if (hasActiveChild) setOpen(true);
   }, [hasActiveChild]);
+
+  if (collapsed) {
+    return (
+      <div className="space-y-0.5">
+        {group.items.map((item) => {
+          const active = item.href === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(item.href);
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={onLinkClick}
+              title={item.label}
+              className={cn(
+                "flex items-center justify-center w-10 h-10 mx-auto rounded-lg transition-all duration-150",
+                active
+                  ? "bg-blue-600 text-white shadow-sm shadow-blue-600/20"
+                  : "text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-700/50"
+              )}
+            >
+              <span className={cn("shrink-0", active ? "text-white" : "")}>
+                {item.icon}
+              </span>
+            </Link>
+          );
+        })}
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -305,9 +342,12 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
   const [ready, setReady] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const [userTier, setUserTier] = useState("");
+  const [userAvatar, setUserAvatar] = useState("");
+  const [userName, setUserName] = useState("");
 
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken");
@@ -316,6 +356,7 @@ export default function DashboardLayout({
       return;
     }
     setUserEmail(localStorage.getItem("userEmail") || "");
+    setCollapsed(localStorage.getItem("sidebarCollapsed") === "true");
     setReady(true);
 
     userApi.getMe()
@@ -325,6 +366,8 @@ export default function DashboardLayout({
           setUserEmail(profile.email);
           localStorage.setItem("userEmail", profile.email);
         }
+        if (profile.avatarEmoji) setUserAvatar(profile.avatarEmoji);
+        if (profile.fullName) setUserName(profile.fullName);
       })
       .catch(() => {});
   }, [router]);
@@ -344,6 +387,14 @@ export default function DashboardLayout({
       router.push("/login");
     }
   }, [router]);
+
+  const toggleCollapsed = useCallback(() => {
+    setCollapsed((prev) => {
+      const next = !prev;
+      localStorage.setItem("sidebarCollapsed", String(next));
+      return next;
+    });
+  }, []);
 
   if (!ready) {
     return (
@@ -367,6 +418,8 @@ export default function DashboardLayout({
 
   const closeSidebar = () => setSidebarOpen(false);
 
+  const sidebarWidth = collapsed ? 72 : 252;
+
   return (
     <div className="min-h-screen bg-[#f8f9fb] dark:bg-[#0b0f1a] transition-colors duration-300">
       {sidebarOpen && (
@@ -376,19 +429,41 @@ export default function DashboardLayout({
         />
       )}
 
-      <aside
+      <motion.aside
+        animate={{ width: sidebarWidth }}
+        transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
         className={cn(
-          "fixed top-0 left-0 z-50 h-full w-[252px] bg-white dark:bg-[#111827] border-r border-slate-200/80 dark:border-slate-700/50 transition-all duration-300 lg:translate-x-0 flex flex-col",
+          "fixed top-0 left-0 z-50 h-full bg-white dark:bg-[#111827] border-r border-slate-200/80 dark:border-slate-700/50 lg:translate-x-0 flex flex-col overflow-hidden",
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
         <div className="h-[60px] flex items-center px-5 shrink-0">
           <Link href="/dashboard" className="flex items-center gap-2.5">
             <LogoIcon size={32} />
-            <span className="text-[16px] font-bold text-slate-900 dark:text-white tracking-tight">
-              NeoBank
-            </span>
+            <AnimatePresence>
+              {!collapsed && (
+                <motion.span
+                  initial={{ opacity: 0, width: 0 }}
+                  animate={{ opacity: 1, width: "auto" }}
+                  exit={{ opacity: 0, width: 0 }}
+                  transition={{ duration: 0.15 }}
+                  className="text-[16px] font-bold text-slate-900 dark:text-white tracking-tight whitespace-nowrap overflow-hidden"
+                >
+                  NeoBank
+                </motion.span>
+              )}
+            </AnimatePresence>
           </Link>
+          <button
+            onClick={toggleCollapsed}
+            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            className="hidden lg:flex ml-auto p-1.5 rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-all"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cn("transition-transform", collapsed ? "rotate-180" : "")}>
+              <path d="M11 19l-7-7 7-7" />
+              <path d="M18 19l-7-7 7-7" />
+            </svg>
+          </button>
           <button
             onClick={closeSidebar}
             className="lg:hidden ml-auto p-1.5 rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
@@ -401,13 +476,14 @@ export default function DashboardLayout({
         </div>
 
         <nav className="flex-1 px-3 py-2 overflow-y-auto">
-          {/* Home link */}
           <div className="mb-1">
             <Link
               href={homeNav.href}
               onClick={closeSidebar}
+              title={collapsed ? homeNav.label : undefined}
               className={cn(
-                "flex items-center gap-3 px-3 py-[9px] rounded-lg text-[13px] font-medium transition-all duration-150 group",
+                "flex items-center rounded-lg text-[13px] font-medium transition-all duration-150 group",
+                collapsed ? "justify-center w-10 h-10 mx-auto" : "gap-3 px-3 py-[9px]",
                 isActive(homeNav.href)
                   ? "bg-blue-600 text-white shadow-sm shadow-blue-600/20"
                   : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-700/50"
@@ -416,13 +492,12 @@ export default function DashboardLayout({
               <span className={cn("shrink-0 transition-colors", isActive(homeNav.href) ? "text-white" : "text-slate-400 dark:text-slate-500 group-hover:text-slate-500 dark:group-hover:text-slate-300")}>
                 {homeNav.icon}
               </span>
-              {homeNav.label}
+              {!collapsed && homeNav.label}
             </Link>
           </div>
 
-          <div className="my-3 mx-3 border-t border-slate-100 dark:border-slate-700/50" />
+          <div className={cn("my-3 border-t border-slate-100 dark:border-slate-700/50", collapsed ? "mx-1" : "mx-3")} />
 
-          {/* Collapsible groups */}
           <div className="space-y-0.5">
             {navGroups.map((group) => (
               <CollapsibleGroup
@@ -430,20 +505,20 @@ export default function DashboardLayout({
                 group={group}
                 pathname={pathname}
                 onLinkClick={closeSidebar}
+                collapsed={collapsed}
               />
             ))}
           </div>
 
           {userTier === "ADMIN" && (
             <>
-              <div className="my-3 mx-3 border-t border-slate-100 dark:border-slate-700/50" />
-              <CollapsibleGroup group={adminGroup} pathname={pathname} onLinkClick={closeSidebar} />
+              <div className={cn("my-3 border-t border-slate-100 dark:border-slate-700/50", collapsed ? "mx-1" : "mx-3")} />
+              <CollapsibleGroup group={adminGroup} pathname={pathname} onLinkClick={closeSidebar} collapsed={collapsed} />
             </>
           )}
 
-          <div className="my-3 mx-3 border-t border-slate-100 dark:border-slate-700/50" />
+          <div className={cn("my-3 border-t border-slate-100 dark:border-slate-700/50", collapsed ? "mx-1" : "mx-3")} />
 
-          {/* Bottom nav items */}
           <div className="space-y-0.5">
             {bottomNav.map((item) => {
               const active = isActive(item.href);
@@ -452,8 +527,10 @@ export default function DashboardLayout({
                   key={item.href}
                   href={item.href}
                   onClick={closeSidebar}
+                  title={collapsed ? item.label : undefined}
                   className={cn(
-                    "flex items-center gap-3 px-3 py-[9px] rounded-lg text-[13px] font-medium transition-all duration-150 group",
+                    "flex items-center rounded-lg text-[13px] font-medium transition-all duration-150 group",
+                    collapsed ? "justify-center w-10 h-10 mx-auto" : "gap-3 px-3 py-[9px]",
                     active
                       ? "bg-blue-600 text-white shadow-sm shadow-blue-600/20"
                       : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-700/50"
@@ -462,8 +539,8 @@ export default function DashboardLayout({
                   <span className={cn("shrink-0 transition-colors", active ? "text-white" : "text-slate-400 dark:text-slate-500 group-hover:text-slate-500 dark:group-hover:text-slate-300")}>
                     {item.icon}
                   </span>
-                  {item.label}
-                  {item.badge && (
+                  {!collapsed && item.label}
+                  {!collapsed && item.badge && (
                     <span className={cn(
                       "ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded",
                       active ? "bg-white/20 text-white" : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
@@ -477,38 +554,49 @@ export default function DashboardLayout({
 
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-3 px-3 py-[9px] rounded-lg text-[13px] font-medium text-slate-600 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-150 group"
+              title={collapsed ? "Sign out" : undefined}
+              className={cn(
+                "w-full flex items-center rounded-lg text-[13px] font-medium text-slate-600 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-150 group",
+                collapsed ? "justify-center w-10 h-10 mx-auto" : "gap-3 px-3 py-[9px]"
+              )}
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400 dark:text-slate-500 group-hover:text-red-500 dark:group-hover:text-red-400 transition-colors shrink-0">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
                 <polyline points="16 17 21 12 16 7" />
                 <line x1="21" y1="12" x2="9" y2="12" />
               </svg>
-              Sign out
+              {!collapsed && "Sign out"}
             </button>
           </div>
         </nav>
 
-        <div className="p-3 border-t border-slate-100 dark:border-slate-700/50 shrink-0 space-y-2">
-          <DarkModeToggle />
-          <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors cursor-default">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-[13px] font-bold text-white shrink-0 ring-2 ring-white dark:ring-slate-800 shadow-sm">
-              {initials}
+        <div className={cn("border-t border-slate-100 dark:border-slate-700/50 shrink-0", collapsed ? "p-2 space-y-1" : "p-3 space-y-2")}>
+          <DarkModeToggle collapsed={collapsed} />
+
+          <div className={cn(
+            "flex items-center rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors cursor-default",
+            collapsed ? "justify-center p-1" : "gap-3 p-2"
+          )}>
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-[16px] font-bold text-white shrink-0 ring-2 ring-white dark:ring-slate-800 shadow-sm">
+              {userAvatar || initials}
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-[13px] font-semibold text-slate-900 dark:text-white truncate">
-                {userEmail || "User"}
-              </p>
-              <p className="text-[11px] text-slate-400 dark:text-slate-500">{userTier === "PREMIUM" || userTier === "ADMIN" ? "Premium" : "Free plan"}</p>
-            </div>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-slate-300 dark:text-slate-600 shrink-0">
-              <polyline points="6 9 12 15 18 9" />
-            </svg>
+            {!collapsed && (
+              <div className="flex-1 min-w-0">
+                <p className="text-[13px] font-semibold text-slate-900 dark:text-white truncate">
+                  {userName || userEmail || "User"}
+                </p>
+                <p className="text-[11px] text-slate-400 dark:text-slate-500">{userTier === "PREMIUM" || userTier === "ADMIN" ? "Premium" : "Free plan"}</p>
+              </div>
+            )}
           </div>
         </div>
-      </aside>
+      </motion.aside>
 
-      <div className="lg:pl-[252px]">
+      <motion.div
+        animate={{ paddingLeft: sidebarWidth }}
+        transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+        className="max-lg:!pl-0"
+      >
         <header className="sticky top-0 z-30 h-[60px] bg-white/80 dark:bg-[#111827]/80 backdrop-blur-lg border-b border-slate-200/80 dark:border-slate-700/50 transition-colors duration-300">
           <div className="h-full px-4 lg:px-6 flex items-center gap-4">
             <button
@@ -553,12 +641,12 @@ export default function DashboardLayout({
               <div className="hidden md:block w-px h-6 bg-slate-200 dark:bg-slate-700 mx-2" />
 
               <Link href="/dashboard/settings" className="hidden md:flex items-center gap-3 px-2 py-1.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors cursor-pointer">
-                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-xs font-bold text-white ring-2 ring-white dark:ring-slate-800 shadow-sm">
-                  {initials}
+                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-[16px] font-bold text-white ring-2 ring-white dark:ring-slate-800 shadow-sm">
+                  {userAvatar || initials}
                 </div>
                 <div className="min-w-0">
                   <p className="text-[13px] font-semibold text-slate-900 dark:text-white truncate leading-tight">
-                    {userEmail?.split("@")[0] || "User"}
+                    {userName || userEmail?.split("@")[0] || "User"}
                   </p>
                   <p className="text-[11px] text-slate-400 dark:text-slate-500 leading-tight">
                     {userTier === "PREMIUM" || userTier === "ADMIN" ? "Premium" : "Free plan"}
@@ -566,8 +654,8 @@ export default function DashboardLayout({
                 </div>
               </Link>
 
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-xs font-bold text-white ring-2 ring-white shadow-sm cursor-pointer md:hidden">
-                {initials}
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-[14px] font-bold text-white ring-2 ring-white shadow-sm cursor-pointer md:hidden">
+                {userAvatar || initials}
               </div>
             </div>
           </div>
@@ -576,7 +664,7 @@ export default function DashboardLayout({
         <main className="p-4 lg:p-6 min-h-[calc(100vh-60px)]">
           {children}
         </main>
-      </div>
+      </motion.div>
     </div>
   );
 }
