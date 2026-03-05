@@ -330,3 +330,32 @@ export const adminApi = {
   unfreezeWallet: (walletId: number) =>
     request<void>(`/admin/wallets/${walletId}/unfreeze`, { method: "POST" }),
 };
+
+/* ------------------------------------------------------------------ */
+/*  Chat (Premium)                                                     */
+/* ------------------------------------------------------------------ */
+
+export interface ChatResponseData {
+  reply: string;
+  action: string | null;
+  actionParams: {
+    receiverId?: number;
+    amount?: string;
+    bankAccountId?: number;
+  } | null;
+  requiresConfirmation: boolean;
+}
+
+export const chatApi = {
+  send: (data: { message: string; history: { role: string; text: string }[] }) =>
+    request<ChatResponseData>("/chat", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
+  confirm: (data: { action: string; params: { receiverId?: number; amount?: string; bankAccountId?: number } }) =>
+    request<ChatResponseData>("/chat/confirm", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+};

@@ -86,3 +86,7 @@ google:
 
 webhook:
   secret: ${WEBHOOK_SECRET:neobank-webhook-dev-secret-change-in-production}
+
+gemini:
+  api-key: ${GEMINI_API_KEY:AIzaSyCT44BcX2BqmmniKUx2neKaQSgp7UfaDpM}
+  model: gemini-2.0-flash

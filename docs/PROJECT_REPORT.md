@@ -1,4 +1,4 @@
-# NeoBank — Closed-Loop Digital Wallet System
+.# NeoBank — Closed-Loop Digital Wallet System
 
 ## 1. Overview
 

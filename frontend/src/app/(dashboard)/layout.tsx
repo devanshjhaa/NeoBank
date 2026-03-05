@@ -7,6 +7,7 @@ import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { LogoIcon } from "@/components/logo";
+import ChatWidget from "@/components/chat/ChatWidget";
 import { userApi, authApi } from "@/lib/api";
 
 interface NavItem {
@@ -665,6 +666,8 @@ export default function DashboardLayout({
           {children}
         </main>
       </motion.div>
+
+      {(userTier === "PREMIUM" || userTier === "ADMIN") && <ChatWidget />}
     </div>
   );
 }
