@@ -82,6 +82,11 @@ public class ChatService {
 
     public ChatResponse chat(Long userId, ChatRequest request) {
         try {
+            if ("no-key-set".equals(apiKey)) {
+                log.warn("Gemini API key not configured");
+                return ChatResponse.text("NeoBot is not configured yet. Please set the GEMINI_API_KEY environment variable.");
+            }
+
             String body = buildGeminiRequest(userId, request);
             String url = String.format(GEMINI_URL, model, apiKey);
 
@@ -94,9 +99,16 @@ public class ChatService {
 
             HttpResponse<String> httpRes = httpClient.send(httpReq, HttpResponse.BodyHandlers.ofString());
 
+            if (httpRes.statusCode() == 400) {
+                log.error("Gemini API bad request: {}", httpRes.body());
+                return ChatResponse.text("I couldn't understand that request. Could you rephrase?");
+            }
+            if (httpRes.statusCode() == 429) {
+                return ChatResponse.text("I'm getting too many requests right now. Please wait a moment and try again.");
+            }
             if (httpRes.statusCode() != 200) {
                 log.error("Gemini API error: status={} body={}", httpRes.statusCode(), httpRes.body());
-                return ChatResponse.text("I'm having trouble connecting right now. Please try again in a moment.");
+                return ChatResponse.text("I'm having trouble right now (error " + httpRes.statusCode() + "). Please try again shortly.");
             }
 
             return parseGeminiResponse(httpRes.body(), userId);
